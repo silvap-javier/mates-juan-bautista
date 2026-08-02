@@ -1,7 +1,16 @@
-# ✏️ Como en clase  ·  💵 El Kiosco  ·  🏦 El Banquito
+# 🎒 Las mates de Juan Bautista
 
-Tres juegos de resta para segundo grado, en un archivo cada uno, sin dependencias ni build.
-Enlazados entre sí; se abren con doble clic o desde el sitio desplegado.
+Tres juegos de resta para segundo grado. Un archivo cada uno, sin dependencias ni build,
+funcionan offline. **`index.html` es la portada**: saluda, muestra las estrellas de cada juego y
+lleva a los tres.
+
+| Archivo | Juego | Qué practica |
+|---------|-------|--------------|
+| `index.html` | 🎒 portada | por dónde empezar |
+| `hoja.html` | ✏️ Como en clase | el método del cuaderno (empezá acá) |
+| `kiosco.html` | 💵 El Kiosco | restar pagando |
+| `numeros.html` | 🏦 El Banquito | descomponer números |
+| `saltos.html` | 🐸 la rana | *sin enlazar* — versión vieja con recta numérica |
 
 ## ✏️ Como en clase — `hoja.html`
 
@@ -16,6 +25,10 @@ arriba del segundo número lo parten en tres pedacitos, y abajo van las tres lí
       45 −  5 = 40
       40 −  2 = 38
 ```
+
+Todas las cuentas son **menores a 50** y el número que se resta tiene **2 o 3 decenas**, como en el
+cuaderno. En las paradas de tres pedacitos, arriba se ve el objetivo armándose solo:
+`? + ? + ? = 26` → `20 + 4 + 2 = 26`, así queda claro que los pedazos tienen que sumar el número.
 
 **La descomposición se ve, no se lee.** Debajo de cada flechita está el pedacito dibujado en plata:
 el `30` son tres billetes verdes, el `2` son dos monedas. Los que todavía no eligió aparecen en gris,
@@ -45,14 +58,14 @@ usan restas que no cruzan la decena y se parten en **dos** pedacitos; de la terc
 que sobra. Con `53 − 25` el corte sería `20 · 3 · 2`. Cambia el número de arriba, cambia el corte.
 
 
-## 💵 El Kiosco — `index.html`
+## 💵 El Kiosco — `kiosco.html`
 
 Restar pagando, con **billetes de 10 y monedas de 1** — el mismo material que
 usa la maestra. Un billete es una decena, una moneda es una unidad.
 
 El chico no calcula: **paga**. Lo que le queda en la billetera *es* el resultado.
 
-Un solo archivo (`index.html`), sin dependencias, sin build, funciona offline.
+Un solo archivo (`kiosco.html`), sin dependencias, sin build, funciona offline.
 El progreso se guarda en `localStorage` del navegador del chico.
 
 ## Dónde está el concepto
