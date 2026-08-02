@@ -321,7 +321,8 @@ const LEVELS = [
     id:1, color:'var(--blue)', title:'Saco las decenas',
     desc:'51 − 20. Las unidades ni se tocan.',
     make(){
-      const m = rnd(21,98), d = rnd(1, Math.floor(m/10)) * 10;
+      let m; do{ m = rnd(21,98); } while(units(m) === 0);   // que siempre haya unidades que "no se tocan"
+      const d = rnd(1, Math.floor(m/10)) * 10;
       const r = m - d;
       return {
         head:`${m} − ${d}`,
