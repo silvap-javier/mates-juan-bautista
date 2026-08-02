@@ -6,20 +6,42 @@ Juego de restas para segundo grado. Enseña **descomposición del sustraendo con
 Un solo archivo (`index.html`), sin dependencias, sin build, funciona offline.
 El progreso se guarda en `localStorage` del navegador del chico.
 
-## Las 6 misiones
+## Cómo se juega
 
-| # | Misión | Qué aísla |
-|---|--------|-----------|
-| 1 | Saco las decenas | `51 − 20` → las unidades no se tocan |
-| 2 | Bajo al redondo | estando en `31`, ¿cuánto saco para llegar a `30`? |
-| 3 | Salto desde el redondo | `30 − 4`, tan fácil como `10 − 4` |
-| 4 | El camino completo | `51 − 25` en los tres saltos, guiado |
-| 5 | Elegí el camino | con `−29` conviene compensar, no descomponer |
-| 6 | Desafío | la cuenta entera, la pista a pedido |
+El chico **no escribe el resultado: lo alcanza saltando**. Arma el tamaño del salto con los
+botones `−10 −1 +1 +10`, ve con la **rana fantasma dónde va a caer antes de saltar**, y repite
+hasta llegar a la meta 🏁. El resultado aparece porque cayó ahí.
 
-Cada misión son 5 cuentas; al terminar cada una aparece **“¿Por qué cortamos ahí?”** con la
-explicación generada para *esos* números — que es el punto: el `−1` de `51 − 25` son las unidades
-del 51, y si la cuenta fuera `53 − 25` el corte sería `20 − 3 − 2`.
+Dos atajos que enseñan solos:
+
+- **Tocar una piedra redonda** calcula el salto necesario y lo dice en voz alta:
+  *“Para llegar a la piedra 40 el salto tiene que ser de 6”*. Ahí se ve que el pedacito
+  son las unidades del número donde está parado.
+- **El búho 🦉 habla en cada paso** — es el adulto acompañando: avisa antes de cruzar
+  una decena, festeja cuando cae en un redondo, y al final muestra la partición que el
+  chico mismo armó.
+
+### Las 6 misiones
+
+| # | Misión | Qué aísla | Meta |
+|---|--------|-----------|------|
+| 1 | Saltos de a diez | `56 − 20` → las unidades no se tocan | 1 salto |
+| 2 | Pisá la piedra redonda | de `34` caer justo en `30` | 1 salto |
+| 3 | Salgo del redondo | `30 − 4`, igual que `10 − 4` | 1 salto |
+| 4 | El camino completo | `51 − 25`: decenas → piedra → resto | 3 saltos |
+| 5 | El atajo del redondo | con `−29` conviene pasarse y devolver | 2 saltos |
+| 6 | Desafío | primero predice el resultado, después lo comprueba | 3 saltos |
+
+### Cómo puntúa (es lo que empuja a partir bien)
+
+Las **3 estrellas** se ganan por llegar **sin cruzar ninguna decena de un salto**, dentro de la
+meta. Si cruza —por ejemplo `58 − 9 = 49` de una— llega igual, pero se lleva 1 estrella y el búho
+le señala el salto culpable y qué hacer en su lugar. No se premia la cuenta rápida: se premia
+**la partición que no obliga a cruzar**, que es exactamente la dificultad que se está atacando.
+
+Al terminar cada cuenta aparece **“¿Por qué cortaste ahí?”** con el camino real que hizo:
+*“Partiste el 16 en 10 + 3 + 3… y ese 3 son las unidades del 43. Con otro número de arriba,
+el corte sería otro.”*
 
 Abajo de todo hay un panel plegable **“Para el adulto”** con el fundamento y la pregunta útil
 para practicar en casa (*“¿por qué cortaste ahí?”*, no *“¿cuánto da?”*).
