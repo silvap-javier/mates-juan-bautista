@@ -1,4 +1,4 @@
-name: el-kiosco
+name: mates-juan-bautista
 region: nyc
 features:
   - buildpack-stack=ubuntu-22
@@ -7,12 +7,11 @@ static_sites:
   - name: web
     # 👇 CAMBIAR por tu usuario/repo de GitHub antes de crear la app
     github:
-      repo: TU-USUARIO/el-kiosco
+      repo: TU-USUARIO/mates-juan-bautista
       branch: main
       deploy_on_push: true
     source_dir: /
     # No hay build: es HTML plano. Se sirve el directorio tal cual.
     output_dir: /
     index_document: index.html
-    error_document: index.html
-    catchall_document: index.html
+    catchall_document: index.html   # cualquier ruta rara cae en la portada
