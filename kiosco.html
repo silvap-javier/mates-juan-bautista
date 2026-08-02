@@ -23,8 +23,12 @@
   }
   .wrap{max-width:760px;margin:0 auto;padding:12px 14px 40px}
 
-  header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
-  .logo{font-size:1.3rem;font-weight:900;letter-spacing:-.5px}
+  header{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:30;
+         background:var(--bg);padding:10px 0 8px;margin-bottom:6px;box-shadow:0 8px 10px -8px rgba(0,0,0,.12)}
+  .logo{font-size:1.3rem;font-weight:900;letter-spacing:-.5px;text-decoration:none;color:inherit;
+        display:flex;align-items:center;gap:6px}
+  .logo:active{transform:scale(.97)}
+  .logo .casita{font-size:.95rem;opacity:.45}
   .spacer{flex:1}
   .chip{background:var(--card);border:2px solid var(--line);border-radius:999px;
         padding:5px 12px;font-weight:800;font-size:1rem;white-space:nowrap}
@@ -72,8 +76,8 @@
   .ticket .lab{font-size:.74rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:800}
   .ticket .item{font-size:1.15rem;font-weight:900;margin:2px 0}
   .ticket .item .ico{font-size:1.5rem;vertical-align:-3px}
-  .ticket .price{font-size:2.5rem;font-weight:900;line-height:1.05}
-  .ticket .price small{font-size:1.05rem}
+  .ticket .price{font-size:1.25rem;font-weight:900;line-height:1.15}
+  .ticket .price .n{font-size:2.6rem;vertical-align:-4px;margin:0 3px}
   .ticket .falta{font-weight:800;color:var(--red);font-size:1rem}
   .ticket .falta b{font-size:1.3rem}
 
@@ -107,7 +111,11 @@
   .op{display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:10px;font-weight:900;font-size:1.15rem}
   .op .ico{font-size:1.1rem;flex:none;width:22px;text-align:center}
   .op .math b{color:var(--blue);margin:0 3px}
-  .op .note{margin-left:auto;font-size:.75rem;font-weight:800;color:var(--muted);text-align:right;flex:none}
+  .op .note{margin-left:auto;font-size:.75rem;font-weight:800;color:var(--muted);text-align:right;flex:none;
+            display:flex;gap:3px;align-items:center;flex-wrap:wrap;justify-content:flex-end;max-width:110px}
+  .op .note i{display:block}
+  .mb{width:18px;height:11px;border-radius:2px;background:var(--bill);border:1.5px solid var(--bill-d)}
+  .mc{width:11px;height:11px;border-radius:50%;background:var(--coin);border:1.5px solid var(--coin-d)}
   .op.brk{background:#fff2e4}
   .op.brk .math b{color:var(--orange)}
   .op.new{background:#e8f7ee;animation:pop .3s}
@@ -161,9 +169,10 @@
   .act:disabled{opacity:.4;box-shadow:none;cursor:not-allowed}
   .act.change{background:var(--green);border-color:var(--green-d);box-shadow:0 4px 0 var(--green-d)}
 
-  .coach{display:flex;gap:9px;align-items:flex-start;background:#f4f0ff;border:2px solid #e0d7f7;
-         border-radius:14px;padding:10px 12px;margin-bottom:10px;font-weight:700;line-height:1.4;
-         min-height:60px;font-size:1rem}
+  .coach{display:flex;gap:9px;align-items:center;background:#f4f0ff;border:2px solid #e0d7f7;
+         border-radius:14px;padding:10px 12px;margin-bottom:10px;font-weight:800;line-height:1.35;
+         min-height:56px;font-size:1.05rem;
+         position:sticky;top:58px;z-index:20;box-shadow:0 6px 14px -6px rgba(0,0,0,.22)}
   .coach .face{font-size:1.5rem;line-height:1.1;flex:none}
   .coach b{color:var(--purple)}
   .coach.ok{background:#eefaf2;border-color:#bde6cd} .coach.ok b{color:var(--green-d)}
@@ -220,7 +229,7 @@
 <div class="wrap">
 
   <header>
-    <div class="logo">💵 El Kiosco</div>
+    <a class="logo" href="index.html">💵 El Kiosco <span class="casita">🏠</span></a>
     <div class="spacer"></div>
     <div class="chip">⭐ <span id="stars">0</span></div>
     <button class="iconbtn" id="sound" title="Sonido">🔊</button>
@@ -246,11 +255,13 @@
     </div>
 
     <div class="ticket">
-      <div class="lab" id="tkLab">comprás</div>
+      <div class="lab" id="tkLab">Comprás</div>
       <div class="item" id="tkItem"></div>
       <div class="price" id="tkPrice"></div>
       <div class="falta" id="tkFalta"></div>
     </div>
+
+    <div class="coach" id="coach"><div class="face">🦉</div><div id="coachTxt"></div></div>
 
     <div id="playArea">
       <!-- lo que hace falta para poder restar -->
@@ -278,14 +289,14 @@
       <button class="act change hidden" id="changeBtn"></button>
 
       <div class="zone counter">
-        <h3>🧾 diste <span class="amt" id="pAmt">0 $</span></h3>
+        <h3>🤝 le diste al kiosquero <span class="amt" id="pAmt">0 $</span></h3>
         <div class="money" id="pBills"></div>
         <div class="money coins" id="pCoins"></div>
       </div>
 
       <!-- la cuenta que se va escribiendo sola -->
       <div class="ops">
-        <h3>📝 la cuenta</h3>
+        <h3>📝 así te va quedando</h3>
         <div id="opsList"></div>
       </div>
     </div>
@@ -299,8 +310,6 @@
         <button class="key del" data-k="del">⌫</button><button class="key" data-k="0">0</button><button class="key ok" data-k="go">✓</button>
       </div>
     </div>
-
-    <div class="coach" id="coach"><div class="face">🦉</div><div id="coachTxt"></div></div>
 
     <div id="summary" class="hidden">
       <details class="porque"><summary>🤔 ¿por qué?</summary><div class="why" id="sumWhy"></div></details>
@@ -532,9 +541,9 @@ function setupTask(t){
   if(!t.ico){ const c = cosa(); t.ico = c[0]; t.nom = c[1]; }
 
   $('roundChip').textContent = `${cur.round} / ${ROUNDS}`;
-  $('tkLab').textContent  = 'comprás';
+  $('tkLab').textContent  = 'Comprás';
   $('tkItem').innerHTML   = `<span class="ico">${t.ico}</span> ${t.nom}`;
-  $('tkPrice').innerHTML  = `${t.s}<small> $</small>`;
+  $('tkPrice').innerHTML  = `de <span class="n">${t.s}</span> pesos`;
   $('summary').classList.add('hidden');
   $('changeBtn').classList.add('hidden');
   $('breakBtn').classList.remove('hidden');
@@ -604,7 +613,8 @@ function startPaying(){
    ========================================================= */
 function render(){
   const f = falta();
-  $('tkFalta').innerHTML = f > 0 ? `falta <b>${f}</b>` : (f === 0 ? '¡justo! 🎉' : `<b>${-f}</b> de más`);
+  $('tkFalta').innerHTML = f > 0 ? `Te falta${f === 1 ? '' : 'n'} <b>${f}</b> peso${f === 1 ? '' : 's'}`
+                         : (f === 0 ? '¡justo! 🎉' : `Diste <b>${-f}</b> peso${-f === 1 ? '' : 's'} de más`);
   $('wAmt').textContent = wVal() + ' $';
   $('pAmt').textContent = pVal() + ' $';
 
@@ -612,7 +622,7 @@ function render(){
   fill($('wCoins'), cur.w.c, 'coin', '1',  payCoin, 'No te quedan monedas sueltas', cur.brillo || 0);
   fill($('pBills'), cur.p.b, 'bill', '10', null, '');
   fill($('pCoins'), cur.p.c, 'coin', '1',  null, '');
-  if(!cur.p.b && !cur.p.c) $('pBills').innerHTML = '<span class="empty">—</span>';
+  if(!cur.p.b && !cur.p.c) $('pBills').innerHTML = '<span class="empty">todavía nada 🙂</span>';
 
   renderDescomp();
   $('breakBtn').disabled = cur.w.b === 0 || f <= 0;
@@ -652,10 +662,9 @@ function renderDescomp(){
   $('dCc').className = 'dcell coins' + (listo ? ' listo' : '');
 
   const nota = $('dNota');
+  nota.classList.toggle('hidden', listo);          // al terminar, la tabla habla sola
   if(listo){
-    nota.className = 'dnota bien';
-    nota.innerHTML = `${A.b} − ${B.b} = <b>${cur.w.b}</b> &nbsp;·&nbsp; ${A.c} − ${B.c} = <b>${cur.w.c}</b> ` +
-                     `&nbsp;→&nbsp; <b>${t.m} − ${t.s} = ${cur.w.b*10 + cur.w.c}</b>`;
+    nota.innerHTML = '';
   }else if(!alcanza){
     nota.className = 'dnota mal';
     nota.innerHTML = `⚠️ <b>${A.c}</b> no alcanza para <b>${B.c}</b> 👉 rompé un billete 🔨`;
@@ -685,7 +694,7 @@ function fill(box, n, cls, txt, fn, vacio, brillan = 0){
 function renderOps(){
   const box = $('opsList');
   if(!cur.ops.length){
-    box.innerHTML = `<div class="vacio">Acá se va a ir escribiendo sola…</div>`;
+    box.innerHTML = `<div class="vacio">✏️ se escribe sola mientras pagás</div>`;
     return;
   }
   box.innerHTML = cur.ops.map((o,i) => {
@@ -693,7 +702,7 @@ function renderOps(){
     if(o.t === 'r')
       return `<div class="op brk${nuevo}"><span class="ico">🔨</span>
                 <span class="math">${o.from} <b>=</b> ${o.billetes} <b>+</b> ${o.monedas}</span>
-                <span class="note">rompí un billete</span></div>`;
+                <span class="note" style="max-width:none">rompí uno 🔨</span></div>`;
     if(o.t === 'v')
       return `<div class="op${nuevo}"><span class="ico">💰</span>
                 <span class="math">${o.from} <b>+</b> ${o.monto} <b>=</b> ${o.to}</span>
@@ -701,10 +710,10 @@ function renderOps(){
     if(o.t === 'fin')
       return `<div class="op tot"><span class="ico">✅</span>
                 <span class="math">${o.m} <b>−</b> ${o.s} <b>=</b> ${o.queda}</span>
-                <span class="note">la cuenta entera</span></div>`;
+                <span class="note" style="max-width:none">¡listo! 🎉</span></div>`;
     return `<div class="op${nuevo}"><span class="ico">${o.t === 'b' ? '💵' : '🪙'}</span>
               <span class="math">${o.from} <b>−</b> ${o.monto} <b>=</b> ${o.to}</span>
-              <span class="note">${o.t === 'b' ? bill(o.n) : mon(o.n)}</span></div>`;
+              <span class="note">${(o.t === 'b' ? '<i class="mb"></i>' : '<i class="mc"></i>').repeat(o.n)}</span></div>`;
   }).join('');
 }
 
@@ -798,8 +807,8 @@ function win(){
   cur.ops.push({t:'fin', m:t.m, s:t.s, queda});
   renderOps();
 
-  $('tkLab').textContent = '¡pagado!';
-  $('tkPrice').innerHTML = `${t.m} − ${t.s} = <b style="color:var(--green-d)">${queda}</b>`;
+  $('tkLab').textContent = '¡Pagado!';
+  $('tkPrice').innerHTML = `<span class="n">${t.m} − ${t.s} = <b style="color:var(--green-d)">${queda}</b></span>`;
   $('tkFalta').innerHTML = '';
   $('breakBtn').classList.add('hidden');
   $('gameTools').classList.add('hidden');

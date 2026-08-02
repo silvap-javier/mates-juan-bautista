@@ -21,8 +21,10 @@
        -webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent;min-height:100dvh}
   .wrap{max-width:640px;margin:0 auto;padding:10px 12px 34px}
 
-  header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-  .logo{font-size:1.25rem;font-weight:900;letter-spacing:-.5px}
+  header{display:flex;align-items:center;gap:8px;position:sticky;top:0;z-index:30;background:var(--bg);padding:10px 0 8px;margin-bottom:6px;box-shadow:0 8px 10px -8px rgba(0,0,0,.12)}
+  .logo{font-size:1.25rem;font-weight:900;letter-spacing:-.5px;text-decoration:none;color:inherit;display:flex;align-items:center;gap:6px}
+  .logo:active{transform:scale(.97)}
+  .logo .casita{font-size:.95rem;opacity:.45}
   .spacer{flex:1}
   .chip{background:var(--card);border:2px solid var(--line);border-radius:999px;
         padding:5px 12px;font-weight:800;font-size:1rem;white-space:nowrap}
@@ -173,7 +175,7 @@
 <div class="wrap">
 
   <header>
-    <div class="logo">✏️ Como en clase</div>
+    <a class="logo" href="index.html">✏️ Como en clase <span class="casita">🏠</span></a>
     <div class="spacer"></div>
     <div class="chip">⭐ <span id="stars">0</span></div>
     <button class="iconbtn" id="sound">🔊</button>
