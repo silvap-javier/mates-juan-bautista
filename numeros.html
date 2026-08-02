@@ -1,0 +1,761 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>El Banquito — armar y leer números</title>
+<meta name="description" content="Juego de descomposición de números para segundo grado: 47 = 40 + 7, y también 47 = 30 + 17, con billetes de 10 y monedas de 1.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏦</text></svg>">
+<style>
+  :root{
+    --bg:#eaf1fb; --card:#fff; --ink:#2f2a24; --muted:#7d7367; --line:#dde5f0;
+    --green:#3fa96a; --green-d:#2d8452; --blue:#3d7dd6; --blue-d:#2e63ac;
+    --orange:#f0913b; --red:#e0574f; --purple:#8a63c8;
+    --bill:#7ec99a; --bill-d:#3f8f60; --coin:#f5c344; --coin-d:#c08d15;
+    --shadow:0 4px 0 rgba(0,0,0,.13);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+       font-family:"Nunito","Trebuchet MS",Verdana,system-ui,sans-serif;
+       -webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent;min-height:100dvh}
+  .wrap{max-width:760px;margin:0 auto;padding:12px 14px 40px}
+
+  header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+  .logo{font-size:1.3rem;font-weight:900;letter-spacing:-.5px}
+  .spacer{flex:1}
+  .chip{background:var(--card);border:2px solid var(--line);border-radius:999px;
+        padding:5px 12px;font-weight:800;font-size:1rem;white-space:nowrap}
+  .iconbtn{background:var(--card);border:2px solid var(--line);border-radius:999px;
+           width:40px;height:40px;font-size:1.1rem;cursor:pointer;line-height:1}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:16px;box-shadow:var(--shadow)}
+  h2{margin:0 0 4px;font-size:1.15rem}
+  .sub{color:var(--muted);font-size:.95rem;margin:0 0 10px}
+
+  /* ---------- camino ---------- */
+  .path{position:relative;margin:4px 0 6px}
+  .path > svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+  .node{position:absolute;width:124px;background:none;border:0;padding:0;cursor:pointer;font:inherit;
+        display:flex;flex-direction:column;align-items:center}
+  .node[disabled]{cursor:not-allowed}
+  .node .ball{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;position:relative;
+              font-size:1.55rem;font-weight:900;color:#fff;border:3px solid rgba(255,255,255,.75);
+              box-shadow:0 5px 0 rgba(0,0,0,.16)}
+  .node:not([disabled]):active .ball{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.16)}
+  .node .cap{font-size:.76rem;font-weight:800;line-height:1.2;margin-top:6px;text-align:center}
+  .node[disabled] .cap{color:#a9b1bd}
+  .node .prog{margin-top:3px;font-size:.7rem;font-weight:900;color:#fff;background:var(--orange);
+              border-radius:999px;padding:1px 8px}
+  .node .stars{margin-top:2px;font-size:.72rem;letter-spacing:1px}
+  .node .me{position:absolute;top:-34px;font-size:1.7rem;animation:hop 1.1s infinite}
+  @keyframes hop{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+  .node.now .ball{animation:ring 1.5s infinite}
+  @keyframes ring{0%,100%{box-shadow:0 5px 0 rgba(0,0,0,.16),0 0 0 0 rgba(61,125,214,.5)}
+                  60%{box-shadow:0 5px 0 rgba(0,0,0,.16),0 0 0 14px rgba(61,125,214,0)}}
+  .shop{position:absolute;transform:translate(-50%,0);text-align:center;width:150px}
+  .shop .ico{font-size:2.6rem;line-height:1}
+  .shop .txt{font-size:.78rem;font-weight:900;color:var(--muted)}
+
+  /* ---------- consigna ---------- */
+  .ticket{background:#fbfdff;border:3px dashed var(--blue);border-radius:18px;
+          padding:10px 14px;text-align:center;margin-bottom:10px}
+  .ticket .lab{font-size:.74rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:800}
+  .ticket .big{font-size:2.9rem;font-weight:900;line-height:1.05}
+  .ticket .nota{font-weight:800;color:var(--orange);font-size:1rem}
+
+  /* ---------- la cuenta ---------- */
+  .ops{border:2px solid #dfe7f2;background:#f6f9fd;border-radius:16px;padding:9px 11px;margin-bottom:10px}
+  .ops h3{margin:0 0 6px;font-size:.74rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+  .op{display:flex;align-items:center;gap:8px;padding:3px 5px;font-weight:900;font-size:1.15rem}
+  .op .ico{font-size:1.05rem;flex:none;width:22px;text-align:center}
+  .op .note{margin-left:auto;font-size:.75rem;font-weight:800;color:var(--muted);flex:none}
+  .op.tot{border-top:2px dotted #cdd8e8;margin-top:5px;padding-top:8px;font-size:1.45rem}
+  .op.tot b{color:var(--blue)}
+  .op.tot.ok b{color:var(--green-d)}
+  .hueco{display:inline-grid;place-items:center;min-width:52px;height:40px;padding:0 8px;
+         border:3px solid var(--blue);border-radius:10px;background:#fff;color:var(--blue-d);vertical-align:-9px}
+  .hueco.mal{border-color:var(--red);color:var(--red);animation:shake .35s}
+  .hueco.bien{border-color:var(--green);color:var(--green-d);background:#eefaf2}
+
+  /* ---------- bandeja ---------- */
+  .zone{border:2px solid var(--line);border-radius:16px;padding:10px 12px;margin-bottom:10px;background:#fffdfa}
+  .zone h3{margin:0 0 8px;font-size:.74rem;letter-spacing:1.5px;text-transform:uppercase;
+           color:var(--muted);display:flex;align-items:center;gap:6px}
+  .zone h3 .amt{margin-left:auto;font-size:1.15rem;letter-spacing:0;color:var(--ink)}
+  .money{display:flex;flex-wrap:wrap;gap:7px;min-height:50px;align-content:flex-start}
+  .money.coins{margin-top:8px}
+  .empty{color:#b9ae9d;font-weight:800;font-size:.92rem;align-self:center}
+  .bill,.coin{font:inherit;font-weight:900;cursor:pointer;padding:0;position:relative;
+              display:grid;place-items:center;animation:pop .25s}
+  .bill{width:74px;height:46px;border-radius:8px;background:var(--bill);border:2px solid var(--bill-d);
+        color:#14492c;font-size:1.4rem;box-shadow:0 3px 0 var(--bill-d)}
+  .bill::after{content:"";position:absolute;inset:5px;border:2px dashed rgba(255,255,255,.65);border-radius:4px}
+  .coin{width:46px;height:46px;border-radius:50%;background:var(--coin);border:2px solid var(--coin-d);
+        color:#5e4405;font-size:1.25rem;box-shadow:0 3px 0 var(--coin-d)}
+  .bill:active,.coin:active{transform:translateY(3px);box-shadow:none}
+  .bill:disabled,.coin:disabled{cursor:default}
+  @keyframes pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+  .shake{animation:shake .35s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+
+  .adders{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+  .adder{font:inherit;font-weight:900;font-size:1rem;padding:14px 6px;cursor:pointer;border-radius:16px;color:#fff}
+  .adder.b{background:var(--bill-d);border:2px solid #2c6b46;box-shadow:0 4px 0 #2c6b46}
+  .adder.c{background:var(--coin-d);border:2px solid #96700f;box-shadow:0 4px 0 #96700f}
+  .adder:active{transform:translateY(3px);box-shadow:none}
+  .adder:disabled{opacity:.4;box-shadow:none;cursor:not-allowed}
+
+  .coach{display:flex;gap:9px;align-items:flex-start;background:#f4f0ff;border:2px solid #e0d7f7;
+         border-radius:14px;padding:10px 12px;margin-bottom:10px;font-weight:700;line-height:1.4;
+         min-height:60px;font-size:1rem}
+  .coach .face{font-size:1.5rem;line-height:1.1;flex:none}
+  .coach b{color:var(--purple)}
+  .coach.ok{background:#eefaf2;border-color:#bde6cd} .coach.ok b{color:var(--green-d)}
+  .coach.no{background:#fdecea;border-color:#f6cfcb} .coach.no b{color:var(--red)}
+
+  .pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+  .key{font:inherit;font-weight:900;font-size:1.5rem;padding:13px 0;cursor:pointer;
+       background:var(--card);border:2px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+  .key:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.13)}
+  .key.ok{background:var(--green);border-color:var(--green-d);color:#fff}
+  .key.del{background:#eef2f7}
+
+  .row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center}
+  .btn{font:inherit;font-weight:800;font-size:1rem;padding:11px 16px;cursor:pointer;
+       background:var(--card);border:2px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+  .btn:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.13)}
+  .btn:disabled{opacity:.4;box-shadow:none}
+  .btn.primary{background:var(--green);border-color:var(--green-d);color:#fff}
+  .btn.blue{background:var(--blue);border-color:var(--blue-d);color:#fff}
+  .btn.sm{font-size:.88rem;padding:8px 12px}
+  .btn.wide{width:100%}
+
+  .why{background:#f4f0ff;border:2px solid #e0d7f7;border-radius:14px;padding:12px 14px;
+       text-align:left;font-weight:700;line-height:1.55;font-size:1rem}
+  .why h4{margin:0 0 6px;font-size:.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--purple)}
+  .why code{background:#fff;border:1px solid #e0d7f7;border-radius:6px;padding:1px 6px;font-weight:900}
+  .win{text-align:center}
+  .win .bigemo{font-size:3.2rem;line-height:1}
+  .starline{font-size:1.9rem;letter-spacing:3px}
+
+  details.adult{margin-top:16px}
+  details.adult summary{cursor:pointer;font-weight:800;color:var(--muted);padding:10px 14px;
+    background:var(--card);border:2px solid var(--line);border-radius:14px;list-style:none}
+  details.adult summary::-webkit-details-marker{display:none}
+  details.adult .body{padding:20px 16px 14px;font-size:.95rem;line-height:1.6;color:#4a433a;
+    background:var(--card);border:2px solid var(--line);border-top:0;border-radius:0 0 14px 14px;margin-top:-8px}
+  details.adult .body b{color:var(--ink)}
+  details.adult .body ul{margin:8px 0;padding-left:20px}
+
+  .hidden{display:none!important}
+  .confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50}
+  .confetti i{position:absolute;width:9px;height:14px;border-radius:2px;animation:fall linear forwards}
+  @keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.9}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">🏦 El Banquito</div>
+    <div class="spacer"></div>
+    <div class="chip">⭐ <span id="stars">0</span></div>
+    <button class="iconbtn" id="sound">🔊</button>
+  </header>
+
+  <!-- ================= MAPA ================= -->
+  <section id="map" class="card">
+    <h2>El camino del banquito</h2>
+    <p class="sub">Todo número se puede <b>partir</b>: 47 son 40 y 7… pero también 30 y 17.</p>
+    <div class="path" id="path"></div>
+    <div class="row">
+      <button class="btn sm" id="resetBtn">↺ Empezar de cero</button>
+      <a class="btn sm" href="index.html" style="text-decoration:none;color:inherit">💵 El Kiosco</a>
+    </div>
+  </section>
+
+  <!-- ================= JUEGO ================= -->
+  <section id="game" class="card hidden">
+    <div class="row" style="margin:0 0 10px">
+      <button class="btn sm" id="backBtn">← Volver</button>
+      <div class="spacer"></div>
+      <div class="chip" id="roundChip">1 / 5</div>
+    </div>
+
+    <div class="ticket">
+      <div class="lab" id="tkLab"></div>
+      <div class="big" id="tkBig"></div>
+      <div class="nota" id="tkNota"></div>
+    </div>
+
+    <div class="ops">
+      <h3>📝 La cuenta</h3>
+      <div id="opsList"></div>
+    </div>
+
+    <div class="zone" id="trayZone">
+      <h3><span id="trayTit">🧰 Tu bandeja</span> <span class="amt" id="trayAmt"></span></h3>
+      <div class="money" id="tBills"></div>
+      <div class="money coins" id="tCoins"></div>
+    </div>
+
+    <div class="adders" id="adders">
+      <button class="adder b" id="addBill">💵 Poner un billete<br>de 10</button>
+      <button class="adder c" id="addCoin">🪙 Poner una moneda<br>de 1</button>
+    </div>
+
+    <div class="pad hidden" id="pad">
+      <button class="key" data-k="1">1</button><button class="key" data-k="2">2</button><button class="key" data-k="3">3</button>
+      <button class="key" data-k="4">4</button><button class="key" data-k="5">5</button><button class="key" data-k="6">6</button>
+      <button class="key" data-k="7">7</button><button class="key" data-k="8">8</button><button class="key" data-k="9">9</button>
+      <button class="key del" data-k="del">⌫</button><button class="key" data-k="0">0</button><button class="key ok" data-k="go">✓</button>
+    </div>
+
+    <div class="coach" id="coach"><div class="face">🦉</div><div id="coachTxt"></div></div>
+
+    <div id="summary" class="hidden">
+      <div class="why" id="sumWhy"></div>
+      <button class="btn primary wide" id="nextBtn" style="margin-top:10px">➡️ Siguiente</button>
+    </div>
+
+    <div class="row" id="gameTools">
+      <button class="btn sm" id="helpBtn">💡 Verlo con la plata</button>
+      <button class="btn sm" id="redoBtn">↺ Empezar de nuevo</button>
+    </div>
+  </section>
+
+  <!-- ================= FIN ================= -->
+  <section id="done" class="card win hidden">
+    <div class="bigemo">🎉</div>
+    <h2 id="doneTitle"></h2>
+    <div class="starline" id="doneStars"></div>
+    <p class="sub" id="doneSub"></p>
+    <div class="why" id="doneWhy"></div>
+    <div class="row" style="justify-content:center">
+      <button class="btn primary" id="againBtn">Otra vez</button>
+      <button class="btn blue" id="mapBtn">Volver al camino</button>
+    </div>
+  </section>
+
+  <!-- ================= ADULTO ================= -->
+  <details class="adult">
+    <summary>👩‍🏫 Para el adulto — cómo acompañar</summary>
+    <div class="body">
+      <p><b>Qué practica.</b> Descomposición de números de dos cifras con el mismo material de la
+      maestra: un <b>billete de 10</b> es una decena, una <b>moneda de 1</b> es una unidad.
+      <code>47 = 40 + 7</code> es la descomposición <i>canónica</i>… pero no es la única, y ahí está
+      lo importante.</p>
+
+      <p><b>Por qué insistimos con <code>47 = 30 + 17</code>.</b> Esa descomposición “rara” —tres
+      billetes y diecisiete monedas— es exactamente lo que pasa cuando en el kiosco <b>rompe un
+      billete</b>, y es lo que sostiene el “me llevo una” de la resta escrita. Un chico que sólo sabe
+      que 47 es 40 + 7 se traba cuando tiene que pagar 8 monedas; uno que sabe que 47 <i>también</i>
+      es 30 + 17 no se traba.</p>
+
+      <p><b>Las paradas van de a poco:</b></p>
+      <ul>
+        <li><b>1. Armá el número</b> — poner billetes y monedas hasta llegar al número pedido.</li>
+        <li><b>2. ¿Cuánto hay?</b> — leer una pila normal (4 billetes y 7 monedas → 47).</li>
+        <li><b>3. Muchas monedas</b> — leer una pila con más de 10 monedas (3 billetes y 14 → 44).
+            Acá aparece la idea de que 10 monedas se juntan en un billete.</li>
+        <li><b>4. Armalo de otra forma</b> — el mismo número, pero con menos billetes de los
+            “normales”: 47 con sólo 3 billetes.</li>
+        <li><b>5. Completá</b> — <code>40 + __ = 47</code>, <code>__ + 7 = 47</code> y también
+            <code>47 = 30 + __</code>.</li>
+        <li><b>6. Desafío</b> — las tres cosas mezcladas.</li>
+      </ul>
+
+      <p><b>La cuenta de arriba</b> escribe la descomposición sola mientras el chico toca la plata:
+      <code>4 billetes = 40</code>, <code>7 monedas = 7</code>, <code>40 + 7 = 47</code>. Es la misma
+      idea que en el kiosco: que lo que hace con las manos quede escrito como cuenta.</p>
+
+      <p><b>Cómo puntúa:</b> armando, 3 estrellas si usa <b>la menor cantidad de piezas posible</b>
+      (o si respeta el límite de billetes cuando se lo pedimos). Leyendo o completando, 3 estrellas si
+      acierta a la primera, 2 a la segunda, 1 después. Equivocarse no cuesta nada más que estrellas.</p>
+
+      <p><b>La pregunta que más rinde en casa:</b> “¿de qué <b>otra</b> forma podés armar el 47?”.</p>
+    </div>
+  </details>
+
+</div>
+
+<script>
+/* =========================================================
+   ESTADO
+   ========================================================= */
+const SAVE = 'el-banquito-v1';
+const state = {stars:0, done:{}, best:{}, sound:true};
+try{ Object.assign(state, JSON.parse(localStorage.getItem(SAVE)||'{}')); }catch(e){}
+if(!state.best) state.best = {};
+const save = () => { try{ localStorage.setItem(SAVE, JSON.stringify(state)); }catch(e){} };
+
+const ROUNDS = 5;
+const $ = id => document.getElementById(id);
+const rnd   = (a,b) => a + Math.floor(Math.random()*(b-a+1));
+const tens  = n => Math.floor(n/10)*10;
+const units = n => n%10;
+const bill  = n => n === 1 ? 'un billete' : `${n} billetes`;
+const mon   = n => n === 1 ? 'una moneda' : `${n} monedas`;
+
+/* ---------- sonido ---------- */
+let actx = null;
+function beep(f, dur=.12, type='sine'){
+  if(!state.sound) return;
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = type; o.frequency.value = f;
+    g.gain.setValueAtTime(.001, actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.16, actx.currentTime+.01);
+    g.gain.exponentialRampToValueAtTime(.001, actx.currentTime+dur);
+    o.connect(g); g.connect(actx.destination);
+    o.start(); o.stop(actx.currentTime+dur+.02);
+  }catch(e){}
+}
+const sBill = () => { beep(430,.07); setTimeout(()=>beep(620,.09),55); };
+const sCoin = () => { beep(900,.06); setTimeout(()=>beep(1250,.08),50); };
+const sNo   = () => beep(165,.16,'square');
+const sWin  = () => [523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.16),i*110));
+
+/* =========================================================
+   PARADAS
+   ========================================================= */
+const numLindo = () => { let n; do{ n = rnd(21,89); } while(units(n) === 0); return n; };
+
+const LEVELS = [
+  { id:1, color:'var(--blue)', title:'Armá el número',
+    make(){ const n = numLindo(); return {mode:'armar', n, maxB:null}; }},
+
+  { id:2, color:'var(--green)', title:'¿Cuánto hay?',
+    make(){ const n = numLindo(); return {mode:'leer', b: tens(n)/10, c: units(n)}; }},
+
+  { id:3, color:'var(--orange)', title:'Muchas monedas',
+    make(){ const c = rnd(11,19), b = rnd(1,6); return {mode:'leer', b, c}; }},
+
+  { id:4, color:'var(--purple)', title:'De otra forma',
+    make(){ let n; do{ n = numLindo(); } while(n < 25);
+            const maxB = tens(n)/10 - 1;                 // un billete menos de lo normal
+            return {mode:'armar', n, maxB}; }},
+
+  { id:5, color:'var(--red)', title:'Completá',
+    make(){ const n = numLindo();
+            const forma = ['du','ud','no','no2'][rnd(0,3)];
+            return {mode:'completar', n, forma}; }},
+
+  { id:6, color:'#00897b', title:'Desafío final',
+    make(){
+      const cual = rnd(0,2);
+      if(cual === 0){ const n = numLindo(); return {mode:'armar', n, maxB: tens(n)/10 - 1}; }
+      if(cual === 1){ const c = rnd(11,19), b = rnd(1,6); return {mode:'leer', b, c}; }
+      return {mode:'completar', n: numLindo(), forma: ['no','no2'][rnd(0,1)]};
+    }}
+];
+
+const NODOS = [{x:52,y:52},{x:20,y:166},{x:74,y:274},{x:26,y:388},{x:76,y:498},{x:44,y:610}];
+const MAPH  = 730;
+
+/* =========================================================
+   CAMINO
+   ========================================================= */
+function renderMap(){
+  const box = $('path');
+  box.style.height = MAPH + 'px';
+  const puntos = NODOS.concat([{x:52, y:MAPH-52}]);
+  let html = `<svg viewBox="0 0 100 ${MAPH}" preserveAspectRatio="none">`;
+  for(let i = 0; i < puntos.length-1; i++){
+    const listo = (state.done[LEVELS[i].id]||0) >= ROUNDS;
+    const a = puntos[i], b = puntos[i+1];
+    html += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${listo?'#8fd3a5':'#dde5f0'}"
+              stroke-width="14" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+             <line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#fff" stroke-width="3"
+              stroke-linecap="round" stroke-dasharray="2 10" opacity=".85" vector-effect="non-scaling-stroke"/>`;
+  }
+  html += `</svg>`;
+
+  let actual = LEVELS.findIndex(L => (state.done[L.id]||0) < ROUNDS);
+  if(actual === -1) actual = LEVELS.length - 1;
+
+  LEVELS.forEach((L,i) => {
+    const abierto = i === 0 || (state.done[LEVELS[i-1].id]||0) >= ROUNDS;
+    const hechas  = state.done[L.id]||0, listo = hechas >= ROUNDS, aca = abierto && i === actual;
+    const n = NODOS[i];
+    html += `
+      <button class="node${aca?' now':''}" ${abierto?'':'disabled'}
+              style="left:${n.x}%;top:${n.y}px;transform:translate(-50%,-31px)" data-lvl="${i}">
+        ${aca ? '<span class="me">🧒</span>' : ''}
+        <span class="ball" style="background:${abierto ? L.color : '#c9d2de'}">${listo ? '★' : (abierto ? L.id : '🔒')}</span>
+        <span class="cap">${L.title}</span>
+        ${listo ? `<span class="stars">${'⭐'.repeat(Math.min(3, Math.round((state.best[L.id]||0)/ROUNDS)))}</span>`
+                : (abierto && hechas ? `<span class="prog">${hechas}/${ROUNDS}</span>` : '')}
+      </button>`;
+  });
+  html += `<div class="shop" style="left:52%;top:${MAPH-46}px"><div class="ico">🏦</div><div class="txt">¡el banquito!</div></div>`;
+
+  box.innerHTML = html;
+  box.querySelectorAll('.node').forEach(b => { if(!b.disabled) b.onclick = () => startLevel(LEVELS[+b.dataset.lvl]); });
+  $('stars').textContent = state.stars;
+}
+
+/* =========================================================
+   MOTOR
+   ========================================================= */
+let cur = null;
+const val = () => cur.b*10 + cur.c;
+
+function show(w){ ['map','game','done'].forEach(id => $(id).classList.toggle('hidden', id !== w)); }
+function startLevel(L){ cur = {level:L, round:0, earned:0}; nextTask(); show('game'); }
+function nextTask(){ setupTask(cur.level.make()); }
+
+function say(face, html, kind){
+  $('coach').className = 'coach' + (kind ? ' ' + kind : '');
+  $('coach').firstElementChild.textContent = face;
+  $('coachTxt').innerHTML = html;
+}
+
+function setupTask(t){
+  cur.task = t;
+  cur.tries = 0;
+  cur.buf = '';
+  cur.ayuda = false;
+  cur.hecho = false;
+  cur.round++;
+  $('roundChip').textContent = `${cur.round} / ${ROUNDS}`;
+  $('summary').classList.add('hidden');
+  $('gameTools').classList.remove('hidden');
+  $('helpBtn').classList.toggle('hidden', t.mode !== 'completar');
+
+  if(t.mode === 'armar'){
+    cur.b = 0; cur.c = 0;
+    cur.ideal = t.maxB === null ? tens(t.n)/10 + units(t.n) : t.maxB + (t.n - t.maxB*10);
+    $('tkLab').textContent = 'Armá el número';
+    $('tkBig').textContent = t.n;
+    $('tkNota').innerHTML = t.maxB === null
+      ? 'con billetes de 10 y monedas de 1'
+      : `pero usando <b>sólo ${bill(t.maxB)}</b>`;
+    $('trayTit').textContent = '🧰 Tu bandeja';
+    $('adders').classList.remove('hidden');
+    $('pad').classList.add('hidden');
+    $('trayZone').classList.remove('hidden');
+    say('🦉', t.maxB === null
+      ? `Poné plata en la bandeja hasta llegar justo a <b>${t.n}</b>. Cada billete vale <b>10</b> y cada moneda vale <b>1</b>.`
+      : `El <b>${t.n}</b> otra vez, pero con <b>sólo ${bill(t.maxB)}</b>. Con ${t.maxB*10} no alcanza… ¿con cuántas monedas lo completás?`);
+  }
+
+  if(t.mode === 'leer'){
+    cur.b = t.b; cur.c = t.c;
+    $('tkLab').textContent = '¿Cuánta plata hay?';
+    $('tkBig').innerHTML = `<span class="hueco" id="hueco">_</span>`;
+    $('tkNota').innerHTML = '';
+    $('trayTit').textContent = '🏦 En la caja hay';
+    $('adders').classList.add('hidden');
+    $('pad').classList.remove('hidden');
+    $('trayZone').classList.remove('hidden');
+    say('🦉', t.c > 10
+      ? `Contá con cuidado: hay <b>${mon(t.c)}</b>, ¡más de diez! Primero los billetes, después las monedas.`
+      : `¿Cuánto suma todo? Los billetes valen 10 cada uno y las monedas 1.`);
+  }
+
+  if(t.mode === 'completar'){
+    const n = t.n, d = tens(n), u = units(n);
+    if(t.forma === 'du'){ cur.izq = d;      cur.der = null; cur.resp = u;     cur.txt = [d, '?', n]; }
+    if(t.forma === 'ud'){ cur.izq = null;   cur.der = u;    cur.resp = d;     cur.txt = ['?', u, n]; }
+    if(t.forma === 'no'){ cur.izq = d - 10; cur.der = null; cur.resp = n - (d-10); cur.txt = [d-10, '?', n]; }
+    if(t.forma === 'no2'){ const y = u + 10; cur.izq = null; cur.der = y; cur.resp = n - y; cur.txt = ['?', y, n]; }
+    const conocido = cur.izq !== null ? cur.izq : cur.der;      // el pedazo que ya está a la vista
+    cur.b = Math.floor(conocido/10); cur.c = conocido % 10;
+    cur.conocido = conocido;
+    $('tkLab').textContent = 'Completá';
+    $('tkBig').innerHTML = `${cur.txt[0] === '?' ? '<span class="hueco" id="hueco">_</span>' : cur.txt[0]}
+                            + ${cur.txt[1] === '?' ? '<span class="hueco" id="hueco">_</span>' : cur.txt[1]}
+                            = ${n}`;
+    $('tkNota').innerHTML = '';
+    $('adders').classList.add('hidden');
+    $('pad').classList.remove('hidden');
+    $('trayZone').classList.add('hidden');
+    say('🦉', (t.forma === 'no' || t.forma === 'no2')
+      ? `Esta es de las raras: <b>${n}</b> también se puede partir así. Pensalo con plata: si guardás menos billetes, te quedan más monedas.`
+      : `¿Qué número falta para llegar a <b>${n}</b>?`);
+  }
+
+  render();
+}
+
+/* =========================================================
+   DIBUJO
+   ========================================================= */
+function render(){
+  const t = cur.task;
+  if(t.mode !== 'completar'){
+    $('trayAmt').textContent = (t.mode === 'armar' ? val() + ' $' : '');
+    fill($('tBills'), cur.b, 'bill', '10', t.mode === 'armar' ? quitarBill : null, 'todavía no hay billetes');
+    fill($('tCoins'), cur.c, 'coin', '1',  t.mode === 'armar' ? quitarCoin : null, 'todavía no hay monedas');
+    if(t.mode === 'armar'){
+      $('addBill').disabled = val() + 10 > t.n || (t.maxB !== null && cur.b >= t.maxB);
+      $('addCoin').disabled = val() + 1  > t.n;
+    }
+  }else if(cur.ayuda){
+    fill($('tBills'), cur.b, 'bill', '10', null, '');
+    fill($('tCoins'), cur.c, 'coin', '1',  null, '');
+  }
+  renderOps();
+}
+
+function fill(box, n, cls, txt, fn, vacio){
+  box.innerHTML = '';
+  if(n === 0){ if(vacio) box.innerHTML = `<span class="empty">${vacio}</span>`; return; }
+  for(let i = 0; i < n; i++){
+    const b = document.createElement('button');
+    b.className = cls; b.textContent = txt;
+    if(fn) b.onclick = fn; else b.disabled = true;
+    box.appendChild(b);
+  }
+}
+
+function renderOps(){
+  const t = cur.task, box = $('opsList');
+  if(t.mode === 'completar'){
+    const a = cur.txt[0] === '?' ? (cur.buf || '?') : cur.txt[0];
+    const b = cur.txt[1] === '?' ? (cur.buf || '?') : cur.txt[1];
+    box.innerHTML = `<div class="op tot"><span class="ico">🔢</span>${a} <b>+</b> ${b} <b>=</b> ${t.n}</div>`;
+    return;
+  }
+  const total = val();
+  const listo = t.mode === 'armar' ? total === t.n : cur.hecho;
+  box.innerHTML =
+    `<div class="op"><span class="ico">💵</span>${bill(cur.b)} <b>=</b> ${cur.b*10}<span class="note">de a 10</span></div>
+     <div class="op"><span class="ico">🪙</span>${mon(cur.c)} <b>=</b> ${cur.c}<span class="note">de a 1</span></div>
+     <div class="op tot${listo?' ok':''}"><span class="ico">${listo?'✅':'🟰'}</span>
+       ${cur.b*10} <b>+</b> ${cur.c} <b>=</b> ${t.mode === 'leer' && !cur.hecho ? (cur.buf || '?') : total}</div>`;
+}
+
+function nope(msg){
+  sNo();
+  $('game').classList.add('shake');
+  setTimeout(()=>$('game').classList.remove('shake'), 360);
+  say('🦉', msg, 'no');
+}
+
+/* =========================================================
+   ARMAR
+   ========================================================= */
+function addBill(){
+  const t = cur.task;
+  if(t.maxB !== null && cur.b >= t.maxB)
+    return nope(`Esta vez sólo podés usar <b>${bill(t.maxB)}</b>. Completá el resto con <b>monedas</b>.`);
+  if(val() + 10 > t.n)
+    return nope(`Otro billete te pasaría de <b>${t.n}</b>. Ahora seguí con <b>monedas</b>.`);
+  cur.b++; sBill(); render(); chequeoArmar('billete');
+}
+function addCoin(){
+  if(val() + 1 > cur.task.n) return nope(`Ya llegaste a ${cur.task.n}.`);
+  cur.c++; sCoin(); render(); chequeoArmar('moneda');
+}
+function quitarBill(){ if(cur.b){ cur.b--; beep(300,.08); render(); say('↩️','Sacaste un billete.'); } }
+function quitarCoin(){ if(cur.c){ cur.c--; beep(340,.08); render(); say('↩️','Sacaste una moneda.'); } }
+
+function chequeoArmar(){
+  const t = cur.task, falta = t.n - val();
+  if(falta === 0) return win();
+  if(t.maxB !== null && cur.b >= t.maxB)
+    return say('🦉', `Ya usaste ${bill(t.maxB)} (<b>${cur.b*10}</b>). Te faltan <b>${falta}</b>, y sólo te quedan monedas.`);
+  if(falta >= 10)
+    return say('🦉', `Vas <b>${val()}</b>. Te faltan ${falta}: todavía entra otro <b>billete</b>.`);
+  return say('🦉', `Vas <b>${val()}</b> y te faltan <b>${falta}</b>. Otro billete se pasaría → ahora <b>monedas</b>.`);
+}
+
+/* =========================================================
+   TECLADO
+   ========================================================= */
+function keyPress(k){
+  if(k === 'del') cur.buf = cur.buf.slice(0,-1);
+  else if(k === 'go') return responder();
+  else if(cur.buf.length < 3){ cur.buf += k; beep(440,.05); }
+  pintarHueco(); renderOps();
+}
+function pintarHueco(){
+  const h = $('hueco');
+  if(h){ h.textContent = cur.buf === '' ? '_' : cur.buf; h.className = 'hueco'; }
+}
+function responder(){
+  if(cur.buf === '') return;
+  const t = cur.task;
+  const esperado = t.mode === 'leer' ? val() : cur.resp;
+  const dado = parseInt(cur.buf,10);
+  const h = $('hueco');
+  if(dado !== esperado){
+    cur.tries++;
+    sNo();
+    if(h){ h.className = 'hueco mal'; }
+    say('🦉', pista(), 'no');
+    setTimeout(()=>{ cur.buf = ''; pintarHueco(); renderOps(); }, 700);
+    return;
+  }
+  cur.hecho = true;
+  if(h) h.className = 'hueco bien';
+  win();
+}
+function pista(){
+  const t = cur.task;
+  if(t.mode === 'leer')
+    return cur.c > 10
+      ? `Todavía no. Fijate: <b>${bill(cur.b)} son ${cur.b*10}</b>. Y ${mon(cur.c)}… ¡son más de diez! ` +
+        `Diez monedas valen lo mismo que un billete.`
+      : `Todavía no. <b>${bill(cur.b)} son ${cur.b*10}</b> y hay <b>${mon(cur.c)}</b>. ¿Cuánto suma?`;
+  if(t.forma === 'du') return `Fijate: ${tens(t.n)} y algo tiene que dar ${t.n}. ¿Cuántas <b>monedas</b> faltan?`;
+  if(t.forma === 'ud') return `¿Cuántos <b>billetes enteros</b> hay en el ${t.n}? Ese número va adelante.`;
+  return `Con plata: si en vez de ${tens(t.n)/10} billetes guardás menos, las que faltan tienen que ser <b>monedas</b>. ` +
+         `Probá contando desde ${cur.izq !== null ? cur.izq : cur.der} hasta ${t.n}.`;
+}
+
+/* =========================================================
+   GANAR
+   ========================================================= */
+function win(){
+  const t = cur.task;
+  let st;
+  if(t.mode === 'armar'){
+    const piezas = cur.b + cur.c;
+    st = piezas <= cur.ideal ? 3 : (piezas <= cur.ideal + 3 ? 2 : 1);
+  }else{
+    st = cur.tries === 0 ? 3 : (cur.tries === 1 ? 2 : 1);
+  }
+  cur.earned += st;
+  state.stars += st;
+  state.done[cur.level.id] = Math.max(state.done[cur.level.id]||0, cur.round);
+  save();
+  $('stars').textContent = state.stars;
+  sWin(); if(st === 3) confetti();
+
+  cur.hecho = true;
+  render();
+  $('adders').classList.add('hidden');
+  $('pad').classList.add('hidden');
+  $('gameTools').classList.add('hidden');
+
+  if(t.mode === 'leer'){ $('tkBig').innerHTML = `<span class="hueco bien">${val()}</span>`; }
+  if(t.mode === 'completar'){
+    $('tkBig').innerHTML = `${cur.txt[0] === '?' ? cur.resp : cur.txt[0]} + ${cur.txt[1] === '?' ? cur.resp : cur.txt[1]} = ${t.n}`;
+  }
+
+  say(st === 3 ? '🎉' : '🙂', mensajeWin(st), st === 3 ? 'ok' : '');
+  $('sumWhy').innerHTML = `<h4>Otra forma de mirarlo</h4>${why()}`;
+  $('summary').classList.remove('hidden');
+  $('nextBtn').textContent = cur.round >= ROUNDS ? '🏁 Terminar' : '➡️ Siguiente';
+}
+
+function mensajeWin(st){
+  const t = cur.task, e = '⭐'.repeat(st);
+  if(t.mode === 'armar')
+    return `¡Lo armaste! <b>${cur.b*10} + ${cur.c} = ${t.n}</b> ${e}<br>` +
+           (t.maxB !== null ? `Con ${bill(cur.b)} y ${mon(cur.c)} — <b>otra forma</b> de armar el mismo número.`
+                            : (cur.b + cur.c <= cur.ideal ? `Y con la menor cantidad de plata posible.`
+                                                          : `Se podía con menos piezas: ${bill(tens(t.n)/10)} y ${mon(units(t.n))}.`));
+  if(t.mode === 'leer')
+    return `¡Sí! <b>${cur.b*10} + ${cur.c} = ${val()}</b> ${e}` +
+           (cur.c > 10 ? `<br>Y ojo: esas ${mon(cur.c)} tienen <b>diez adentro</b>, que valen otro billete.` : '');
+  return `¡Exacto! <b>${cur.resp}</b> ${e}`;
+}
+
+function why(){
+  const t = cur.task;
+  if(t.mode === 'armar' && t.maxB === null)
+    return `El <b>${t.n}</b> es <code>${tens(t.n)} + ${units(t.n)}</code>: ${bill(tens(t.n)/10)} y ${mon(units(t.n))}.<br>` +
+           `Pero no es la única forma. Con <b>un billete menos</b> también se puede: ` +
+           `<code>${tens(t.n)-10} + ${t.n-(tens(t.n)-10)}</code>. Es el mismo ${t.n}, repartido distinto.`;
+  if(t.mode === 'armar')
+    return `<code>${cur.b*10} + ${cur.c} = ${t.n}</code> — y lo normal habría sido ` +
+           `<code>${tens(t.n)} + ${units(t.n)}</code>. <b>Las dos son el ${t.n}.</b><br>` +
+           `Esta segunda forma es exactamente lo que pasa en el kiosco cuando <b>rompés un billete</b>: ` +
+           `tenés un billete menos y diez monedas más, pero la misma plata.`;
+  if(t.mode === 'leer'){
+    const n = val();
+    if(t.c > 10)
+      return `Había ${bill(t.b)} y ${mon(t.c)}: <code>${t.b*10} + ${t.c} = ${n}</code>.<br>` +
+             `Como las monedas pasaban de diez, <b>diez de ellas se juntan en un billete</b>: ` +
+             `${n} también es ${bill(tens(n)/10)} y ${mon(units(n))} → <code>${tens(n)} + ${units(n)}</code>. ` +
+             `<b>Dos formas de decir el mismo número.</b>`;
+    return `<code>${t.b*10} + ${t.c} = ${n}</code>. Los billetes te dan las <b>decenas</b> y las monedas las <b>unidades</b>: ` +
+           `el ${n} se escribe con un ${units(n)} al final justo porque hay ${mon(t.c)}.`;
+  }
+  const n = t.n;
+  if(t.forma === 'du' || t.forma === 'ud')
+    return `<code>${tens(n)} + ${units(n)} = ${n}</code>: la forma de siempre, ${bill(tens(n)/10)} y ${mon(units(n))}.<br>` +
+           `Probá pensar también <code>${tens(n)-10} + ${n-tens(n)+10} = ${n}</code>. También da ${n}.`;
+  return `<code>${cur.izq !== null ? cur.izq : cur.resp} + ${cur.der !== null ? cur.der : cur.resp} = ${n}</code> ` +
+         `es una forma <b>rara pero correcta</b> de partir el ${n}: menos billetes y más monedas.<br>` +
+         `La de siempre es <code>${tens(n)} + ${units(n)}</code>. Saber las dos es lo que después te salva ` +
+         `cuando tenés que <b>romper un billete</b> para pagar.`;
+}
+
+function afterSummary(){
+  if(cur.round >= ROUNDS){
+    const L = cur.level;
+    state.done[L.id] = ROUNDS;
+    state.best[L.id] = Math.max(state.best[L.id]||0, cur.earned);
+    save();
+    $('doneTitle').textContent = `¡Pasaste “${L.title}”!`;
+    $('doneStars').textContent = '⭐'.repeat(Math.min(cur.earned,15));
+    $('doneSub').innerHTML = `${ROUNDS} números — ganaste ${cur.earned} estrellas.`;
+    $('doneWhy').innerHTML = $('sumWhy').innerHTML;
+    show('done'); confetti(); renderMap();
+  }else{
+    cur.hecho = false;
+    nextTask();
+  }
+}
+
+function confetti(){
+  const c = document.createElement('div'); c.className = 'confetti';
+  const cols = ['#3fa96a','#3d7dd6','#f0913b','#e0574f','#8a63c8'];
+  for(let i=0;i<70;i++){
+    const p = document.createElement('i');
+    p.style.left = Math.random()*100+'vw'; p.style.top = '-20px';
+    p.style.background = cols[i%cols.length];
+    p.style.animationDuration = (1.4+Math.random()*1.4)+'s';
+    p.style.animationDelay = (Math.random()*.5)+'s';
+    c.appendChild(p);
+  }
+  document.body.appendChild(c);
+  setTimeout(()=>c.remove(),3600);
+}
+
+/* ---------- eventos ---------- */
+$('addBill').onclick = addBill;
+$('addCoin').onclick = addCoin;
+$('nextBtn').onclick = afterSummary;
+$('backBtn').onclick = () => { renderMap(); show('map'); };
+$('mapBtn').onclick  = () => { renderMap(); show('map'); };
+$('againBtn').onclick= () => startLevel(cur.level);
+$('redoBtn').onclick = () => { cur.round--; cur.hecho = false; setupTask(cur.task); };
+$('helpBtn').onclick = () => {
+  cur.ayuda = !cur.ayuda;
+  $('trayZone').classList.toggle('hidden', !cur.ayuda);
+  $('trayTit').innerHTML = `💡 Esto es el ${cur.conocido}`;
+  $('trayAmt').textContent = '';
+  render();
+  if(cur.ayuda) say('💡', `Ahí tenés el <b>${cur.conocido}</b> en plata. ` +
+                          `¿Cuánto más hay que poner para llegar a <b>${cur.task.n}</b>?`);
+};
+$('resetBtn').onclick = () => {
+  if(!confirm('¿Borrar estrellas y empezar de cero?')) return;
+  state.stars = 0; state.done = {}; state.best = {}; save(); renderMap();
+};
+$('sound').onclick = () => {
+  state.sound = !state.sound; save();
+  $('sound').textContent = state.sound ? '🔊' : '🔇';
+  if(state.sound) beep(660,.1);
+};
+$('sound').textContent = state.sound ? '🔊' : '🔇';
+document.querySelectorAll('.key').forEach(b => b.onclick = () => keyPress(b.dataset.k));
+document.addEventListener('keydown', e => {
+  if($('pad').classList.contains('hidden') || $('game').classList.contains('hidden')) return;
+  if(/^[0-9]$/.test(e.key)) keyPress(e.key);
+  else if(e.key === 'Backspace'){ e.preventDefault(); keyPress('del'); }
+  else if(e.key === 'Enter') keyPress('go');
+});
+
+renderMap();
+show('map');
+</script>
+</body>
+</html>

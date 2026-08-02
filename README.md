@@ -1,4 +1,4 @@
-# 💵 El Kiosco
+# 💵 El Kiosco  ·  🏦 El Banquito
 
 Juego de restas para segundo grado, con **billetes de 10 y monedas de 1** — el mismo material que
 usa la maestra. Un billete es una decena, una moneda es una unidad.
@@ -63,6 +63,42 @@ un conteo. Y romper un billete se escribe `50 = 40 + 10`: la misma plata, repart
 Al terminar queda la resta completa escrita, hecha por él. Vale la pena leerla en voz alta juntos.
 
 Hay **↩️ Deshacer** para volver atrás una acción sin reiniciar la compra.
+
+## 🏦 El Banquito — descomposición de números
+
+`numeros.html` — el mismo camino y el mismo material, pero sobre **descomponer números**, que es lo
+que la maestra trabaja día a día. Enlazado desde el mapa del kiosco.
+
+La idea que sostiene todo: `47 = 40 + 7` **no es la única forma**. También es `30 + 17`, y esa
+descomposición “rara” es exactamente lo que pasa cuando en el kiosco **rompe un billete**. Un chico
+que sólo sabe que 47 es 40 + 7 se traba cuando tiene que pagar 8 monedas; uno que sabe que 47
+*también* es 30 + 17 no se traba. Por eso las dos últimas paradas insisten con esa forma.
+
+| # | Parada | Qué hace |
+|---|--------|----------|
+| 1 | Armá el número | pone billetes y monedas hasta llegar justo al número |
+| 2 | ¿Cuánto hay? | lee una pila normal (4 billetes y 7 monedas → 47) |
+| 3 | Muchas monedas | lee una pila con más de 10 monedas (6 billetes y 15 → 75) |
+| 4 | De otra forma | el mismo número con **un billete menos**: 54 con 4 billetes → `40 + 14` |
+| 5 | Completá | `40 + __ = 47`, `__ + 7 = 47` y también `30 + __ = 47` |
+| 6 | Desafío final | las tres cosas mezcladas, siempre en la forma rara |
+
+La cuenta se escribe sola mientras toca la plata:
+
+```
+💵 3 billetes = 30      de a 10
+🪙 6 monedas  =  6      de a 1
+────────────────────────────────
+   30 + 6 = 36
+```
+
+Al armar, poner un billete que se pasaría del número está bloqueado, con el motivo. Al completar hay
+un **💡 Verlo con la plata** que muestra en billetes y monedas **el pedazo que ya se conoce** (no la
+respuesta).
+
+Puntúa: armando, 3 estrellas si usa la menor cantidad de piezas posible (o si respeta el límite de
+billetes cuando se lo pedimos). Leyendo o completando, 3 estrellas si acierta a la primera, 2 a la
+segunda, 1 después.
 
 ## También está el juego de la rana
 
