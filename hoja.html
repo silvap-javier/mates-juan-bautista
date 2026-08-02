@@ -68,22 +68,32 @@
   .hoja::before{content:"";position:absolute;left:22px;top:0;bottom:0;width:2px;background:#f0b6b0}
 
   /* flechitas + pedacitos */
-  .cortes{display:flex;justify-content:center;gap:14px;margin-bottom:-2px;min-height:52px;align-items:flex-end}
+  .cortes{display:flex;justify-content:center;gap:10px;min-height:80px;align-items:flex-start}
+  .col{width:78px;display:flex;flex-direction:column;align-items:center;gap:5px}
   .corte{
-    width:54px;height:46px;display:grid;place-items:center;border-radius:12px;
+    width:60px;height:46px;display:grid;place-items:center;border-radius:12px;
     font-size:1.7rem;font-weight:900;color:var(--tinta);
     border:3px dashed #c8d3e6;background:#fff;
   }
+  /* la plata que representa cada pedacito */
+  .plata{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;align-content:flex-start;
+         width:78px;min-height:32px}
+  .bi{width:22px;height:14px;border-radius:3px;background:#7ec99a;border:2px solid #3f8f60}
+  .mo{width:13px;height:13px;border-radius:50%;background:#f5c344;border:2px solid #c08d15}
+  .plata.off .bi{background:#eae6da;border-color:#d2ccbc}
+  .plata.off .mo{background:#eae6da;border-color:#d2ccbc}
   .corte.puesto{border-style:solid;border-color:var(--green);background:#eefaf2;animation:caer .35s}
   .corte.turno{border-color:var(--orange);animation:latir 1.2s infinite}
   @keyframes caer{from{transform:translateY(-26px) scale(.5);opacity:0}to{transform:none;opacity:1}}
   @keyframes latir{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
-  .flechas{display:flex;justify-content:center;gap:14px;color:#9fb0c9;font-size:1.5rem;line-height:.9;margin-bottom:2px}
-  .flechas span{width:54px;text-align:center}
+  .flechas{display:flex;justify-content:center;gap:10px;color:#9fb0c9;font-size:1.5rem;line-height:.9;margin-bottom:2px}
+  .flechas span{width:78px;text-align:center}
   .flechas span.on{color:var(--green)}
 
   .principal{text-align:center;font-size:2.3rem;font-weight:900;color:var(--tinta);line-height:1.15}
   .principal .res{color:var(--green-d)}
+  /* las unidades del número de arriba: de ahí sale el pedacito del medio */
+  .principal .uni{border-radius:8px;padding:0 5px;background:#fff2cf;box-shadow:inset 0 -6px 0 #f5c344}
 
   .lineas{margin-top:10px;display:grid;gap:2px}
   .linea{font-size:1.55rem;font-weight:900;text-align:center;animation:escribir .4s}
@@ -373,7 +383,10 @@ function pintarHoja(){
   if(t.cruza){
     $('cortes').innerHTML = [0,1,2].map(i => {
       const ya = corteListo(i), turno = t.pasos[hechos] === 'c' + (i+1);
-      return `<div class="corte${ya?' puesto':''}${turno?' turno':''}">${ya ? cur.p[i] : '?'}</div>`;
+      return `<div class="col">
+                <div class="corte${ya?' puesto':''}${turno?' turno':''}">${ya ? cur.p[i] : '?'}</div>
+                <div class="plata${ya?'':' off'}">${(ya || !t.solo) ? plata(cur.p[i]) : ''}</div>
+              </div>`;
     }).join('');
     $('flechas').innerHTML = [0,1,2].map(i =>
       `<span class="${corteListo(i)?'on':''}">${['↖','↑','↗'][i]}</span>`).join('');
@@ -381,9 +394,10 @@ function pintarHoja(){
     $('cortes').innerHTML = ''; $('flechas').innerHTML = '';
   }
 
+  const arriba = t.cruza ? `${tens(t.m)/10 ? String(t.m).slice(0,-1) : ''}<span class="uni">${units(t.m)}</span>` : t.m;
   const der = cur.listo ? ` <span class="res">${t.m - t.s}</span>`
             : (t.cruza ? '' : ` <span class="hueco">${cur.buf || '?'}</span>`);
-  $('principal').innerHTML = `${t.m} − ${t.s} =${der}`;
+  $('principal').innerHTML = `${arriba} − ${t.s} =${der}`;
 
   const L = [];
   if(t.cruza){
@@ -399,6 +413,12 @@ function pintarHoja(){
     }
   }
   $('lineas').innerHTML = L.join('');
+}
+
+/* un pedacito dibujado en plata: los de 10 son billetes, los sueltos monedas */
+function plata(n){
+  return '<span class="bi"></span>'.repeat(Math.floor(n/10)) +
+         '<span class="mo"></span>'.repeat(n % 10);
 }
 
 /* ---------- qué se pide ahora ---------- */

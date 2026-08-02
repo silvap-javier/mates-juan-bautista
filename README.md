@@ -17,6 +17,12 @@ arriba del segundo número lo parten en tres pedacitos, y abajo van las tres lí
       40 −  2 = 38
 ```
 
+**La descomposición se ve, no se lee.** Debajo de cada flechita está el pedacito dibujado en plata:
+el `30` son tres billetes verdes, el `2` son dos monedas. Los que todavía no eligió aparecen en gris,
+así puede contarlos antes de decidir. Y **las unidades del número de arriba van resaltadas en amarillo**
+(el `2` de `72`), que es de donde sale el pedacito del medio — el que lo deja parado en un redondo.
+En la última parada la ayuda gris desaparece.
+
 Casi sin texto: las únicas consignas son **“Primero las decenas”**, **“Bajá al redondo”**,
 **“Lo que sobra”** y **“¿Cuánto da?”**. Los cortes se eligen tocando un número grande; los
 resultados se escriben con el teclado. Si se equivoca: `🙈 Esa no…`, y a la segunda una pista de
