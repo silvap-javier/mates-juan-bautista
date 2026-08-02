@@ -43,6 +43,34 @@ terminada queda con sus estrellas. Lo que está más adelante se ve con candado.
 En cada compra sale un producto del kiosco al azar (🍫 un alfajor, 🪀 un yoyó, ✏️ un lápiz…) con su
 precio. Son 5 compras por parada.
 
+## “Para poder pagar…”: la descomposición que hace falta
+
+Arriba de la billetera hay una tabla de **decenas y unidades** que muestra, en vivo, la
+descomposición que el número necesita para poder restarse:
+
+```
+                    💵 billetes    🪙 monedas
+                       de 10          de 1
+   tenés  42             4̶ 3          2̶ 12
+   pagás  27              2             7
+   ─────────────────────────────────────────
+   te quedan              ?             ?
+
+   ✅ Rompiste un billete: el 42 dejó de ser 40 + 2 y ahora es 30 + 12.
+      Con 12 monedas ya podés pagar 7.
+```
+
+Antes de romper, la celda de las monedas **late en rojo**: *“⚠️ Con 2 monedas no podés pagar 7”*.
+Al romper, el 4 queda tachado con un 3 al lado y el 2 pasa a 12 — que es exactamente lo que la
+maestra escribe arriba de la cuenta en columna. Al terminar, la nota cierra el círculo:
+
+```
+3 − 2 = 1 billetes  y  12 − 7 = 5 monedas  →  42 − 27 = 15
+```
+
+La tabla no aparece en la parada 5 (la del vuelto), porque ahí la estrategia no es descomponer sino
+compensar.
+
 ## “La cuenta”: el puente al papel
 
 Arriba de la billetera hay un panel donde **cada acción escribe su operación sola**:

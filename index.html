@@ -77,6 +77,30 @@
   .ticket .falta{font-weight:800;color:var(--red);font-size:1rem}
   .ticket .falta b{font-size:1.3rem}
 
+  /* ================= DESCOMPOSICIÓN ================= */
+  .descomp{border:2px solid #e2d7ef;background:#faf7ff;border-radius:16px;padding:9px 11px;margin-bottom:10px}
+  .descomp h3{margin:0 0 6px;font-size:.74rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+  .drow{display:grid;grid-template-columns:1fr 72px 72px;align-items:center;gap:4px}
+  .drow.head{font-size:.66rem;font-weight:900;letter-spacing:.5px;color:var(--muted);text-transform:uppercase}
+  .drow.head div{text-align:center;line-height:1.15}
+  .drow.res{border-top:2px dotted #d9cbe9;margin-top:4px;padding-top:6px}
+  .dlab{font-weight:800;font-size:.92rem;color:var(--ink)}
+  .dlab b{font-size:1.15rem}
+  .dcell{
+    text-align:center;font-weight:900;font-size:1.6rem;line-height:1.1;
+    border-radius:10px;padding:3px 0;
+  }
+  .dcell.bills{background:#e9f6ee;color:var(--bill-d)}
+  .dcell.coins{background:#fdf3dc;color:var(--coin-d)}
+  .dcell.falla{background:#fdecea;color:var(--red);animation:latir 1.2s infinite}
+  .dcell.listo{background:#eefaf2;color:var(--green-d)}
+  .dcell s{font-size:.85rem;opacity:.5;margin-right:4px;font-weight:800}
+  .dcell .humo{opacity:.35;font-size:1.2rem}
+  @keyframes latir{0%,100%{transform:scale(1)}50%{transform:scale(1.09)}}
+  .dnota{margin-top:7px;font-size:.88rem;font-weight:800;text-align:center;padding:5px;border-radius:10px}
+  .dnota.mal{background:#fdecea;color:#a8322b}
+  .dnota.bien{background:#eefaf2;color:var(--green-d)}
+
   /* ================= LA CUENTA ================= */
   .ops{border:2px solid #dfe7f2;background:#f6f9fd;border-radius:16px;padding:8px 10px;margin-bottom:10px}
   .ops h3{margin:0 0 6px;font-size:.74rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
@@ -213,10 +237,17 @@
     </div>
 
     <div id="playArea">
-      <!-- la cuenta que se va escribiendo sola -->
-      <div class="ops">
-        <h3>📝 La cuenta</h3>
-        <div id="opsList"></div>
+      <!-- lo que hace falta para poder restar -->
+      <div class="descomp" id="descomp">
+        <h3>🔎 Para poder pagar…</h3>
+        <div class="drow head"><div></div><div>💵 billetes<br>de 10</div><div>🪙 monedas<br>de 1</div></div>
+        <div class="drow"><div class="dlab" id="dLabA"></div>
+          <div class="dcell bills" id="dAb"></div><div class="dcell coins" id="dAc"></div></div>
+        <div class="drow"><div class="dlab" id="dLabB"></div>
+          <div class="dcell bills" id="dBb"></div><div class="dcell coins" id="dBc"></div></div>
+        <div class="drow res"><div class="dlab">te quedan</div>
+          <div class="dcell" id="dCb"></div><div class="dcell" id="dCc"></div></div>
+        <div class="dnota" id="dNota"></div>
       </div>
 
       <div class="zone">
@@ -233,6 +264,12 @@
         <h3>🧾 Ya pagaste <span class="amt" id="pAmt">0 $</span></h3>
         <div class="money" id="pBills"></div>
         <div class="money coins" id="pCoins"></div>
+      </div>
+
+      <!-- la cuenta que se va escribiendo sola -->
+      <div class="ops">
+        <h3>📝 La cuenta</h3>
+        <div id="opsList"></div>
       </div>
     </div>
 
@@ -565,9 +602,60 @@ function render(){
   fill($('pCoins'), cur.p.c, 'coin', '1',  null, '');
   if(!cur.p.b && !cur.p.c) $('pBills').innerHTML = '<span class="empty">todavía no diste nada</span>';
 
+  renderDescomp();
   $('breakBtn').disabled = cur.w.b === 0 || f <= 0;
   $('undoBtn').disabled  = cur.acts.length === 0;
   renderOps();
+}
+
+/* La descomposición que hace falta para poder restar:
+   51 deja de ser 50 + 1 y pasa a ser 40 + 11, porque con 1 moneda no se pagan 5. */
+function renderDescomp(){
+  const t = cur.task;
+  if(t.over){ $('descomp').classList.add('hidden'); return; }   // con vuelto no se descompone
+  $('descomp').classList.remove('hidden');
+
+  const A0 = {b: tens(t.m)/10, c: units(t.m)};          // como venía el número
+  const A  = {b: A0.b - cur.breaks, c: A0.c + 10*cur.breaks};   // como quedó después de los canjes
+  const B  = {b: tens(t.s)/10,  c: units(t.s)};
+  const listo   = falta() === 0;
+  const alcanza = A.c >= B.c;
+
+  $('dLabA').innerHTML = `tenés <b>${t.m}</b>`;
+  $('dLabB').innerHTML = `pagás <b>${t.s}</b>`;
+
+  $('dAb').innerHTML = cur.breaks ? `<s>${A0.b}</s>${A.b}` : A.b;
+  $('dAc').innerHTML = cur.breaks ? `<s>${A0.c}</s>${A.c}` : A.c;
+  $('dAc').className = 'dcell coins' + (!alcanza && !listo ? ' falla' : (cur.breaks ? ' listo' : ''));
+  $('dAb').className = 'dcell bills' + (cur.breaks ? ' listo' : '');
+
+  $('dBb').textContent = B.b;
+  $('dBc').textContent = B.c;
+
+  $('dCb').innerHTML = listo ? cur.w.b : '<span class="humo">?</span>';
+  $('dCc').innerHTML = listo ? cur.w.c : '<span class="humo">?</span>';
+  $('dCb').className = 'dcell' + (listo ? ' listo' : '');
+  $('dCc').className = 'dcell' + (listo ? ' listo' : '');
+
+  const nota = $('dNota');
+  if(listo){
+    nota.className = 'dnota bien';
+    nota.innerHTML = `${A.b} − ${B.b} = <b>${cur.w.b}</b> billetes &nbsp;y&nbsp; ${A.c} − ${B.c} = <b>${cur.w.c}</b> monedas ` +
+                     `→ <b>${t.m} − ${t.s} = ${cur.w.b*10 + cur.w.c}</b>`;
+  }else if(!alcanza){
+    nota.className = 'dnota mal';
+    nota.innerHTML = `⚠️ Con <b>${A.c}</b> ${A.c === 1 ? 'moneda' : 'monedas'} no podés pagar <b>${B.c}</b>. ` +
+                     `Hay que <b>romper un billete</b>.`;
+  }else if(cur.breaks){
+    nota.className = 'dnota bien';
+    nota.innerHTML = `✅ Rompiste un billete: el <b>${t.m}</b> dejó de ser <b>${A0.b*10} + ${A0.c}</b> ` +
+                     `y ahora es <b>${A.b*10} + ${A.c}</b>. Con ${A.c} monedas ya podés pagar ${B.c}.`;
+  }else{
+    nota.className = 'dnota bien';
+    nota.innerHTML = B.c === 0
+      ? `✅ Sólo hay que dar billetes: las monedas ni se tocan.`
+      : `✅ Te alcanza con las <b>${mon(A.c)}</b> que ya tenés para pagar <b>${B.c}</b>: no hace falta romper nada.`;
+  }
 }
 
 function fill(box, n, cls, txt, fn, vacio){
@@ -746,7 +834,9 @@ function why(queda){
 
   }else{
     out = `Para pagar <b>${t.s}</b> hacían falta <b>${mon(us)}</b> y en la billetera tenías <b>${um}</b>. ` +
-          `Por eso, en algún momento, hubo que <b>romper un billete</b>.<br>`;
+          `Por eso el <b>${t.m}</b> tuvo que dejar de ser <code>${tens(t.m)} + ${um}</code> ` +
+          `y pasar a ser <code>${tens(t.m)-10} + ${um+10}</code>. ` +
+          `<b>Esa es la descomposición que hacía falta</b> para poder restar.<br>`;
     if(cur.sucios === 0){
       const pasos = [];
       if(dz) pasos.push(`${bill(dz/10)} (<b>${dz}</b>)`);
