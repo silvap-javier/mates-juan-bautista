@@ -108,8 +108,13 @@ terminada queda con sus estrellas. Lo que está más adelante se ve con candado.
 | 5 | Me dan vuelto | con precio 38 conviene dar 40 y recibir 2 |
 | 6 | Desafío final | primero predice lo que le va a quedar, después lo comprueba |
 
-En cada compra sale un producto del kiosco al azar (🍫 un alfajor, 🪀 un yoyó, ✏️ un lápiz…) con su
-precio. Son 5 compras por parada.
+En cada compra sale un producto del kiosco al azar: *“Comprás 🎨 témperas de 17 pesos · Te faltan
+17 pesos”*. Son 5 compras por parada.
+
+El ayudante 🦉 habla en telegrama (`Falta 6 · 0 🪙 👉 🔨`) y va **flotando pegado abajo del precio**,
+no al final de la página, así se lee sin scrollear. El encabezado también queda fijo, y tocando el
+nombre del juego se vuelve a la portada. En «así te va quedando», cada línea lleva **el dibujito de
+la plata** que se usó en vez de la palabra.
 
 ## “Para poder pagar…”: la descomposición que hace falta
 
