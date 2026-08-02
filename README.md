@@ -1,50 +1,57 @@
-# 🐸 Saltos de Rana
+# 💵 El Kiosco
 
-Juego de restas para segundo grado. Enseña **descomposición del sustraendo con apoyo en la decena**
-(*bridging through ten*): en vez de restar 25 de un tirón, la rana salta `−20`, `−1`, `−4`.
+Juego de restas para segundo grado, con **billetes de 10 y monedas de 1** — el mismo material que
+usa la maestra. Un billete es una decena, una moneda es una unidad.
+
+El chico no calcula: **paga**. Lo que le queda en la billetera *es* el resultado.
 
 Un solo archivo (`index.html`), sin dependencias, sin build, funciona offline.
 El progreso se guarda en `localStorage` del navegador del chico.
 
-## Cómo se juega
+## Dónde está el concepto
 
-El chico **no escribe el resultado: lo alcanza saltando**. Arma el tamaño del salto con los
-botones `−10 −1 +1 +10`, ve con la **rana fantasma dónde va a caer antes de saltar**, y repite
-hasta llegar a la meta 🏁. El resultado aparece porque cayó ahí.
+Pagar 25 teniendo 51 (5 billetes y 1 moneda):
 
-Dos atajos que enseñan solos:
+1. Da **2 billetes** → le quedan 31. *Las monedas ni se tocan.*
+2. Faltan 5 monedas y sólo tiene 1. Da **esa moneda** → le quedan **30 justos, sólo billetes**.
+3. Ya no tiene monedas sueltas: **rompe un billete** y se lo cambian por 10 monedas.
+4. Da **4 monedas** → le quedan 2 billetes y 6 monedas = **26**.
 
-- **Tocar una piedra redonda** calcula el salto necesario y lo dice en voz alta:
-  *“Para llegar a la piedra 40 el salto tiene que ser de 6”*. Ahí se ve que el pedacito
-  son las unidades del número donde está parado.
-- **El búho 🦉 habla en cada paso** — es el adulto acompañando: avisa antes de cruzar
-  una decena, festeja cuando cae en un redondo, y al final muestra la partición que el
-  chico mismo armó.
+Eso es exactamente `51 − 25 = 51 − (20 + 1 + 4)`: quitar el número entero o quitarlo por pedazos da
+lo mismo, siempre que los pedazos sumen el total. Y el famoso **“1”** deja de ser misterioso:
+**son las monedas sueltas que tenía**. Si la cuenta fuera `53 − 25`, tendría 3 sueltas y la partición
+sería `20 + 3 + 2`. **Cambia el minuendo, cambia el corte.**
 
-### Las 6 misiones
+**Romper el billete es pedir prestado**, pero visible y con una razón: *no me quedan monedas*.
+Cuando pase a la cuenta escrita en columna, ese “me llevo una” ya va a tener significado.
 
-| # | Misión | Qué aísla | Meta |
-|---|--------|-----------|------|
-| 1 | Saltos de a diez | `56 − 20` → las unidades no se tocan | 1 salto |
-| 2 | Pisá la piedra redonda | de `34` caer justo en `30` | 1 salto |
-| 3 | Salgo del redondo | `30 − 4`, igual que `10 − 4` | 1 salto |
-| 4 | El camino completo | `51 − 25`: decenas → piedra → resto | 3 saltos |
-| 5 | El atajo del redondo | con `−29` conviene pasarse y devolver | 2 saltos |
-| 6 | Desafío | primero predice el resultado, después lo comprueba | 3 saltos |
+## Las 6 misiones
 
-### Cómo puntúa (es lo que empuja a partir bien)
+| # | Misión | Qué aísla |
+|---|--------|-----------|
+| 1 | Pago con billetes | el precio es justo de billetes; las monedas no se mueven |
+| 2 | Doy las monedas sueltas | pagar con las sueltas y quedar en un número redondo |
+| 3 | Rompo un billete | no hay monedas: hay que cambiar |
+| 4 | La compra completa | billetes → sueltas → romper → resto |
+| 5 | Pago de más y me dan vuelto | con precio 38 conviene dar 40 y recibir 2 |
+| 6 | Desafío | primero predice lo que le va a quedar, después lo comprueba |
 
-Las **3 estrellas** se ganan por llegar **sin cruzar ninguna decena de un salto**, dentro de la
-meta. Si cruza —por ejemplo `58 − 9 = 49` de una— llega igual, pero se lleva 1 estrella y el búho
-le señala el salto culpable y qué hacer en su lugar. No se premia la cuenta rápida: se premia
-**la partición que no obliga a cruzar**, que es exactamente la dificultad que se está atacando.
+## Cómo puntúa (es lo que empuja a partir bien)
 
-Al terminar cada cuenta aparece **“¿Por qué cortaste ahí?”** con el camino real que hizo:
-*“Partiste el 16 en 10 + 3 + 3… y ese 3 son las unidades del 43. Con otro número de arriba,
-el corte sería otro.”*
+**3 estrellas** por romper **sólo cuando hacía falta** y por dar antes las monedas sueltas que ya
+tenía. Si rompe teniendo monedas en la mano llega igual, pero el búho se lo marca: dando primero las
+sueltas le quedan **30 justos**, y desde ahí es más fácil. Romper todo y pagar de a una moneda
+funciona… y da 1 estrella.
 
-Abajo de todo hay un panel plegable **“Para el adulto”** con el fundamento y la pregunta útil
-para practicar en casa (*“¿por qué cortaste ahí?”*, no *“¿cuánto da?”*).
+El búho 🦉 acompaña en cada paso: avisa cuándo hay que romper, frena si intenta pagar de más con un
+billete, y al final muestra **la partición que el chico mismo armó**.
+
+La pregunta que más rinde en casa no es *“¿cuánto da?”* sino **“¿por qué rompiste ahí?”**.
+
+## También está el juego de la rana
+
+`saltos.html` — la misma idea sobre una recta numérica, con saltos. Está enlazado desde el mapa.
+Es más abstracto: sirve como paso siguiente, cuando el kiosco ya le sale solo.
 
 ## Probarlo en local
 
@@ -53,15 +60,17 @@ python3 -m http.server 8080
 # abrir http://localhost:8080
 ```
 
+O directamente: abrir `index.html` con doble clic (no necesita servidor).
+
 ## Desplegar en DigitalOcean App Platform
 
 App Platform necesita un repo git como origen. Una sola vez:
 
 ```bash
 # 1. subir a GitHub (repo nuevo, vacío, sin README)
-git init && git add -A && git commit -m "Saltos de Rana"
+git init && git add -A && git commit -m "El Kiosco"
 git branch -M main
-git remote add origin git@github.com:TU-USUARIO/saltos-de-rana.git
+git remote add origin git@github.com:TU-USUARIO/el-kiosco.git
 git push -u origin main
 
 # 2. poner tu usuario/repo en .do/app.yaml (línea `repo:`)
@@ -83,5 +92,3 @@ output directory `/`. No hace falta comando de build.
 ```bash
 git add -A && git commit -m "ajustes" && git push
 ```
-
-O forzar sin cambios: `doctl apps create-deployment <APP_ID>`.
