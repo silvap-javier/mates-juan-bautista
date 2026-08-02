@@ -5,9 +5,9 @@ features:
 
 static_sites:
   - name: web
-    # 👇 CAMBIAR por tu usuario/repo de GitHub antes de crear la app
+    # repo real: github.com/silvap-javier/mates-juan-bautista
     github:
-      repo: TU-USUARIO/mates-juan-bautista
+      repo: silvap-javier/mates-juan-bautista
       branch: main
       deploy_on_push: true
     source_dir: /
