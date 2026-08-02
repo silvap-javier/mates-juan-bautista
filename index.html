@@ -193,6 +193,11 @@
   details.adult .body b{color:var(--ink)}
   details.adult .body ul{margin:8px 0;padding-left:20px}
 
+  details.porque summary{cursor:pointer;font-weight:900;color:var(--purple);list-style:none;
+    padding:9px 12px;background:#f4f0ff;border:2px solid #e0d7f7;border-radius:14px;font-size:.95rem}
+  details.porque summary::-webkit-details-marker{display:none}
+  details.porque[open] summary{border-radius:14px 14px 0 0;border-bottom:0}
+  details.porque .why{border-radius:0 0 14px 14px;border-top:0}
   .hidden{display:none!important}
   .confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50}
   .confetti i{position:absolute;width:9px;height:14px;border-radius:2px;animation:fall linear forwards}
@@ -216,6 +221,7 @@
     <div class="path" id="path"></div>
     <div class="row">
       <button class="btn sm" id="resetBtn">↺ Empezar de cero</button>
+      <a class="btn sm" href="hoja.html" style="text-decoration:none;color:inherit">✏️ Como en clase</a>
       <a class="btn sm" href="numeros.html" style="text-decoration:none;color:inherit">🏦 El Banquito</a>
       <a class="btn sm" href="saltos.html" style="text-decoration:none;color:inherit">🐸 El juego de la rana</a>
     </div>
@@ -286,7 +292,7 @@
     <div class="coach" id="coach"><div class="face">🦉</div><div id="coachTxt"></div></div>
 
     <div id="summary" class="hidden">
-      <div class="why" id="sumWhy"></div>
+      <details class="porque"><summary>🤔 ¿por qué?</summary><div class="why" id="sumWhy"></div></details>
       <button class="btn primary wide" id="nextBtn" style="margin-top:10px">➡️ Siguiente compra</button>
     </div>
 
@@ -580,8 +586,7 @@ function startPaying(){
   $('playArea').classList.remove('hidden');
   $('gameTools').classList.remove('hidden');
   const t = cur.task;
-  say('🦉', `Tenés <b>${t.m} pesos</b>: ${bill(cur.w.b)} y ${mon(cur.w.c)}. ` +
-            `${t.nom.charAt(0).toUpperCase()+t.nom.slice(1)} sale <b>${t.s}</b>. Tocá la plata para dársela al kiosquero.`);
+  say('🦉', `Tenés <b>${t.m}</b> 👉 ${bill(cur.w.b)} y ${mon(cur.w.c)}.<br>Tocá tu plata para pagar.`);
   render();
 }
 
@@ -640,21 +645,19 @@ function renderDescomp(){
   const nota = $('dNota');
   if(listo){
     nota.className = 'dnota bien';
-    nota.innerHTML = `${A.b} − ${B.b} = <b>${cur.w.b}</b> billetes &nbsp;y&nbsp; ${A.c} − ${B.c} = <b>${cur.w.c}</b> monedas ` +
-                     `→ <b>${t.m} − ${t.s} = ${cur.w.b*10 + cur.w.c}</b>`;
+    nota.innerHTML = `${A.b} − ${B.b} = <b>${cur.w.b}</b> &nbsp;·&nbsp; ${A.c} − ${B.c} = <b>${cur.w.c}</b> ` +
+                     `&nbsp;→&nbsp; <b>${t.m} − ${t.s} = ${cur.w.b*10 + cur.w.c}</b>`;
   }else if(!alcanza){
     nota.className = 'dnota mal';
-    nota.innerHTML = `⚠️ Con <b>${A.c}</b> ${A.c === 1 ? 'moneda' : 'monedas'} no podés pagar <b>${B.c}</b>. ` +
-                     `Hay que <b>romper un billete</b>.`;
+    nota.innerHTML = `⚠️ <b>${A.c}</b> no alcanza para <b>${B.c}</b> 👉 rompé un billete 🔨`;
   }else if(cur.breaks){
     nota.className = 'dnota bien';
-    nota.innerHTML = `✅ Rompiste un billete: el <b>${t.m}</b> dejó de ser <b>${A0.b*10} + ${A0.c}</b> ` +
-                     `y ahora es <b>${A.b*10} + ${A.c}</b>. Con ${A.c} monedas ya podés pagar ${B.c}.`;
+    nota.innerHTML = `✅ El <b>${t.m}</b> era ${A0.b*10} + ${A0.c} … ahora es <b>${A.b*10} + ${A.c}</b>`;
   }else{
     nota.className = 'dnota bien';
     nota.innerHTML = B.c === 0
-      ? `✅ Sólo hay que dar billetes: las monedas ni se tocan.`
-      : `✅ Te alcanza con las <b>${mon(A.c)}</b> que ya tenés para pagar <b>${B.c}</b>: no hace falta romper nada.`;
+      ? `✅ Sólo billetes: las monedas ni se tocan`
+      : `✅ <b>${A.c}</b> alcanza para <b>${B.c}</b>: no hay que romper`;
   }
 }
 
@@ -709,8 +712,7 @@ function payBill(){
   const f = falta();
   if(f <= 0) return nope('Ya pagaste todo.');
   if(f < 10 && !cur.task.over)
-    return nope(`Con un billete de 10 pagarías <b>de más</b>: te faltan sólo <b>${f}</b>. ` +
-                (cur.w.c ? `Pagá con monedas.` : `No te quedan monedas sueltas… <b>rompé un billete</b> 🔨`));
+    return nope(`Falta sólo <b>${f}</b> 👉 ` + (cur.w.c ? `pagá con monedas 🪙` : `<b>rompé un billete</b> 🔨`));
   cur.acts.push('b'); replay(); sBill();
   after('Diste un billete de 10.');
 }
@@ -726,13 +728,9 @@ function breakBill(){
   const sueltas = cur.w.c;
   cur.acts.push('r'); replay(); sBreak(); render();
   if(sueltas > 0)
-    say('😅', `Lo rompiste, pero <b>todavía tenías ${mon(sueltas)} sueltas</b>. ` +
-              `Si las dabas primero te quedaban <b>${wVal() - sueltas} justos</b>, sólo billetes, ` +
-              `y romper uno desde ahí es más fácil. Se llega igual, pero acordate para la próxima.`, 'no');
+    say('😅', `Tenías <b>${mon(sueltas)}</b> todavía.<br>Mejor darlas primero 👉 quedabas en <b>${wVal()-sueltas}</b>`, 'no');
   else
-    say('🔨', `¡Bien! Te lo cambiaron por <b>10 monedas</b>. Fijate en la cuenta: ` +
-              `<b>${cur.ops[cur.ops.length-1].from}</b> sigue siendo la misma plata, ` +
-              `sólo que ahora en ${bill(cur.w.b)} y ${mon(cur.w.c)}. Te falta poner <b>${falta()}</b>.`, 'ok');
+    say('🔨', `¡Bien! Ahora tenés <b>${mon(cur.w.c)}</b>.<br>Falta poner <b>${falta()}</b>`, 'ok');
 }
 
 function undo(){
@@ -752,15 +750,10 @@ function after(txt){
 
 function advice(hecho){
   const f = falta(), c = cur.w.c;
-  if(f >= 10)
-    return ['🦉', `${hecho} Te falta poner <b>${f}</b>. Seguí con <b>billetes</b> mientras te alcancen — cada uno vale 10.`];
-  if(c === 0)
-    return ['🦉', `Te faltan <b>${f}</b> y <b>no tenés ninguna moneda suelta</b>. Tenés ${wVal()} justos, todo en billetes. ` +
-                  `Hay que <b>romper un billete</b> 🔨 y te lo cambian por 10 monedas.`, 'no'];
-  if(c < f)
-    return ['🦉', `Te faltan <b>${f}</b> monedas y sólo tenés <b>${c}</b>. <b>Dá esa${c===1?'':'s'} primero</b>: ` +
-                  `te vas a quedar con <b>${wVal() - c} justos</b>, sólo billetes. Y desde ahí rompés uno.`];
-  return ['🦉', `Te faltan <b>${f}</b> y tenés ${mon(c)}. ¡Te alcanza! Dalas y listo.`];
+  if(f >= 10)   return ['🦉', `Falta <b>${f}</b> 👉 seguí con <b>billetes</b> 💵`];
+  if(c === 0)   return ['🦉', `Falta <b>${f}</b> y no te quedan monedas.<br><b>Rompé un billete</b> 🔨`, 'no'];
+  if(c < f)     return ['🦉', `Falta <b>${f}</b> y tenés <b>${c}</b>.<br>Dá esa${c===1?'':'s'} primero → quedás en <b>${wVal()-c}</b>`];
+  return ['🦉', `Falta <b>${f}</b> 👉 te alcanza con las monedas 🪙`];
 }
 
 function offerChange(){
@@ -774,8 +767,7 @@ function offerChange(){
     $('changeBtn').classList.add('hidden');
     sCoin(); render(); win();
   };
-  say('💰', `Pagaste <b>${pVal()}</b> y ${cur.task.nom} salía <b>${cur.task.s}</b>: diste <b>${vuelto}</b> de más. ` +
-            `El kiosquero te tiene que dar <b>${mon(vuelto)}</b> de vuelto.`, 'ok');
+  say('💰', `Diste <b>${vuelto}</b> de más 👉 te lo devuelven`, 'ok');
 }
 
 /* =========================================================
@@ -802,7 +794,7 @@ function win(){
   $('gameTools').classList.add('hidden');
 
   say(st === 3 ? '🎉' : '🙂',
-      `Te quedaron <b>${bill(cur.w.b)}</b> y <b>${mon(cur.w.c)}</b> = <b>${queda} pesos</b>. ${'⭐'.repeat(st)}` +
+      `Te quedan <b>${queda}</b> ${'⭐'.repeat(st)}` +
       (cur.guess !== null ? (cur.guess === queda ? `<br>¡Y lo habías dicho: <b>${cur.guess}</b>! 🤯`
                                                  : `<br>Habías dicho ${cur.guess}, y quedaron ${queda}.`) : ''),
       st === 3 ? 'ok' : '');

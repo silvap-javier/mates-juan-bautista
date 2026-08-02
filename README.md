@@ -1,6 +1,44 @@
-# 💵 El Kiosco  ·  🏦 El Banquito
+# ✏️ Como en clase  ·  💵 El Kiosco  ·  🏦 El Banquito
 
-Juego de restas para segundo grado, con **billetes de 10 y monedas de 1** — el mismo material que
+Tres juegos de resta para segundo grado, en un archivo cada uno, sin dependencias ni build.
+Enlazados entre sí; se abren con doble clic o desde el sitio desplegado.
+
+## ✏️ Como en clase — `hoja.html`
+
+**Copia la hoja de la escuela.** Papel rayado, margen rojo, y la misma notación: las flechitas
+arriba del segundo número lo parten en tres pedacitos, y abajo van las tres líneas.
+
+```
+        20    5    2
+         ↖    ↑    ↗
+      65 − 27 = 38
+      65 − 20 = 45
+      45 −  5 = 40
+      40 −  2 = 38
+```
+
+Casi sin texto: las únicas consignas son **“Primero las decenas”**, **“Bajá al redondo”**,
+**“Lo que sobra”** y **“¿Cuánto da?”**. Los cortes se eligen tocando un número grande; los
+resultados se escriben con el teclado. Si se equivoca: `🙈 Esa no…`, y a la segunda una pista de
+cuatro palabras (*“Mirá el final del 51”*).
+
+| # | Parada | Qué pide |
+|---|--------|----------|
+| 1 | Fáciles | restas que no cruzan la decena, de una |
+| 2 | Saco decenas | `41 − 20` |
+| 3 | Los pedacitos | sólo elegir los tres cortes; las líneas salen solas |
+| 4 | Las tres líneas | los cortes ya vienen marcados; escribe los resultados |
+| 5 | Todo junto | corte y resultado, uno tras otro |
+| 6 | Vos solo | igual, con números más grandes |
+
+**El corte no es fijo.** El primer pedacito son las decenas del número que resta; el segundo son
+**las unidades del número de arriba** (el 1 del 51), para caer justo en un redondo; el tercero es lo
+que sobra. Con `53 − 25` el corte sería `20 · 3 · 2`. Cambia el número de arriba, cambia el corte.
+
+
+## 💵 El Kiosco — `index.html`
+
+Restar pagando, con **billetes de 10 y monedas de 1** — el mismo material que
 usa la maestra. Un billete es una decena, una moneda es una unidad.
 
 El chico no calcula: **paga**. Lo que le queda en la billetera *es* el resultado.
