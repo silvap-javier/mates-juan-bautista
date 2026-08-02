@@ -25,28 +25,44 @@ sería `20 + 3 + 2`. **Cambia el minuendo, cambia el corte.**
 **Romper el billete es pedir prestado**, pero visible y con una razón: *no me quedan monedas*.
 Cuando pase a la cuenta escrita en columna, ese “me llevo una” ya va a tener significado.
 
-## Las 6 misiones
+## El camino
 
-| # | Misión | Qué aísla |
+Las paradas no son una lista: son un **camino tipo tablero** que baja serpenteando hasta el kiosco 🏪.
+El chico 🧒 está parado en la parada donde va, el tramo recorrido se pinta de verde, y cada parada
+terminada queda con sus estrellas. Lo que está más adelante se ve con candado.
+
+| # | Parada | Qué aísla |
 |---|--------|-----------|
 | 1 | Pago con billetes | el precio es justo de billetes; las monedas no se mueven |
-| 2 | Doy las monedas sueltas | pagar con las sueltas y quedar en un número redondo |
+| 2 | Doy las sueltas | pagar con las sueltas y quedar en un número redondo |
 | 3 | Rompo un billete | no hay monedas: hay que cambiar |
 | 4 | La compra completa | billetes → sueltas → romper → resto |
-| 5 | Pago de más y me dan vuelto | con precio 38 conviene dar 40 y recibir 2 |
-| 6 | Desafío | primero predice lo que le va a quedar, después lo comprueba |
+| 5 | Me dan vuelto | con precio 38 conviene dar 40 y recibir 2 |
+| 6 | Desafío final | primero predice lo que le va a quedar, después lo comprueba |
 
-## Cómo puntúa (es lo que empuja a partir bien)
+En cada compra sale un producto del kiosco al azar (🍫 un alfajor, 🪀 un yoyó, ✏️ un lápiz…) con su
+precio. Son 5 compras por parada.
 
-**3 estrellas** por romper **sólo cuando hacía falta** y por dar antes las monedas sueltas que ya
-tenía. Si rompe teniendo monedas en la mano llega igual, pero el búho se lo marca: dando primero las
-sueltas le quedan **30 justos**, y desde ahí es más fácil. Romper todo y pagar de a una moneda
-funciona… y da 1 estrella.
+## “La cuenta”: el puente al papel
 
-El búho 🦉 acompaña en cada paso: avisa cuándo hay que romper, frena si intenta pagar de más con un
-billete, y al final muestra **la partición que el chico mismo armó**.
+Arriba de la billetera hay un panel donde **cada acción escribe su operación sola**:
 
-La pregunta que más rinde en casa no es *“¿cuánto da?”* sino **“¿por qué rompiste ahí?”**.
+```
+65 − 10 = 55     un billete
+55 −  5 = 50     5 monedas
+50  = 40 + 10    rompí un billete
+50 −  3 = 47     3 monedas
+─────────────────────────────
+65 − 18 = 47     la cuenta entera
+```
+
+Las acciones seguidas del mismo tipo **se juntan en una sola línea**: dar 5 monedas escribe
+`55 − 5 = 50`, no cinco restas de 1. Eso es lo que hace que se lea como una descomposición y no como
+un conteo. Y romper un billete se escribe `50 = 40 + 10`: la misma plata, repartida distinto.
+
+Al terminar queda la resta completa escrita, hecha por él. Vale la pena leerla en voz alta juntos.
+
+Hay **↩️ Deshacer** para volver atrás una acción sin reiniciar la compra.
 
 ## También está el juego de la rana
 
