@@ -28,14 +28,17 @@ Casi sin texto: las únicas consignas son **“Primero las decenas”**, **“Ba
 resultados se escriben con el teclado. Si se equivoca: `🙈 Esa no…`, y a la segunda una pista de
 cuatro palabras (*“Mirá el final del 51”*).
 
-| # | Parada | Qué pide |
-|---|--------|----------|
-| 1 | Fáciles | restas que no cruzan la decena, de una |
-| 2 | Saco decenas | `41 − 20` |
-| 3 | Los pedacitos | sólo elegir los tres cortes; las líneas salen solas |
-| 4 | Las tres líneas | los cortes ya vienen marcados; escribe los resultados |
-| 5 | Todo junto | corte y resultado, uno tras otro |
-| 6 | Vos solo | igual, con números más grandes |
+**Nunca se pide el resultado de golpe**: siempre hay flechitas y líneas. Las dos primeras paradas
+usan restas que no cruzan la decena y se parten en **dos** pedacitos; de la tercera en adelante, en tres.
+
+| # | Parada | Pedacitos | Qué pide |
+|---|--------|-----------|----------|
+| 1 | Dos pedacitos | 2 | los cortes ya vienen marcados; escribe las dos cuentas |
+| 2 | Cortá vos | 2 | elige los cortes y escribe las cuentas |
+| 3 | Tres pedacitos | 3 | sólo elegir los tres cortes; las líneas salen solas |
+| 4 | Las tres líneas | 3 | los cortes ya vienen marcados; escribe los resultados |
+| 5 | Todo junto | 3 | corte y resultado, uno tras otro |
+| 6 | Vos solo | 3 | igual, sin la ayuda gris y con números más grandes |
 
 **El corte no es fijo.** El primer pedacito son las decenas del número que resta; el segundo son
 **las unidades del número de arriba** (el 1 del 51), para caer justo en un redondo; el tercero es lo

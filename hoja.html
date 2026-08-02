@@ -228,8 +228,10 @@
       sería <code>20 · 3 · 2</code>. <b>Cambia el número de arriba, cambia el corte.</b></p>
       <p><b>Por qué funciona:</b> restar 25 de un tirón es difícil; restar 20, después 1 y después 4
       son tres pasos fáciles, y ninguno cruza un número redondo — que es justo donde se traba.</p>
-      <p>Las paradas 1 y 2 sueltan una sola cuenta. De la 3 en adelante aparece la hoja completa.
-      En la 6 elige los cortes y escribe los resultados sin ayuda.</p>
+      <p><b>Nunca se pide el resultado de golpe.</b> Las paradas 1 y 2 usan restas que no cruzan la
+      decena, con <b>dos</b> pedacitos (<code>36 − 13</code> → <code>10 · 3</code>); de la 3 en adelante
+      son tres. Primero la hoja viene con los cortes marcados y él escribe las cuentas; después elige
+      los cortes; al final hace todo.</p>
       <p><b>La pregunta útil en casa:</b> “¿por qué cortaste ahí?”. Si la contesta, entendió.</p>
     </div>
   </details>
@@ -275,40 +277,37 @@ const sWin = () => [523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.16),
 /* =========================================================
    CUENTAS
    ========================================================= */
-/* resta que NO cruza la decena: 48 − 34 */
-function directa(){
-  const um = rnd(2,9), us = rnd(1, um);
-  const dm = rnd(3,9), ds = rnd(1, dm-1);
-  return {m: dm*10 + um, s: ds*10 + us, cruza:false};
+/* SIN cruzar la decena: 36 − 13 → dos pedacitos [10, 3] */
+function facil(){
+  const um = rnd(3,9), us = rnd(1, um-1);
+  const dm = rnd(3,8), ds = rnd(1, dm-1);
+  return {m: dm*10 + um, s: ds*10 + us, p: [ds*10, us]};
 }
-/* resta que SÍ cruza: 51 − 25 (unidades de arriba menores) */
-function cruzada(max=9){
+/* CRUZANDO la decena: 51 − 25 → tres pedacitos [20, 1, 4] */
+function dificil(max){
   const um = rnd(1,8), us = rnd(um+1, 9);
-  const ds = rnd(1, 3), dm = rnd(ds+1, max);
-  return {m: dm*10 + um, s: ds*10 + us, cruza:true};
-}
-function pedazos(t){                       // 25 → [20, 1, 4]
-  return [tens(t.s), units(t.m), units(t.s) - units(t.m)];
+  const ds = rnd(1,3), dm = rnd(ds+1, max);
+  return {m: dm*10 + um, s: ds*10 + us, p: [ds*10, um, us - um]};
 }
 
 const LEVELS = [
-  { id:1, color:'var(--green)', title:'Fáciles', modo:'directa',
-    make(){ return {...directa(), pasos:['res']}; }},
+  { id:1, color:'var(--green)', title:'Dos pedacitos',
+    make(){ return {...facil(), pasos:['l1','l2']}; }},                      // los cortes ya vienen
 
-  { id:2, color:'var(--blue)', title:'Saco decenas', modo:'decenas',
-    make(){ const t = cruzada(); return {m:t.m, s:tens(t.s), cruza:false, pasos:['res']}; }},
+  { id:2, color:'var(--blue)', title:'Cortá vos',
+    make(){ return {...facil(), pasos:['c1','l1','c2','l2']}; }},
 
-  { id:3, color:'var(--orange)', title:'Los pedacitos', modo:'cortes',
-    make(){ return {...cruzada(7), pasos:['c1','c2','c3']}; }},
+  { id:3, color:'var(--orange)', title:'Tres pedacitos',
+    make(){ return {...dificil(7), pasos:['c1','c2','c3']}; }},              // sólo los cortes
 
-  { id:4, color:'var(--purple)', title:'Las tres líneas', modo:'lineas',
-    make(){ return {...cruzada(7), pasos:['l1','l2','l3']}; }},
+  { id:4, color:'var(--purple)', title:'Las tres líneas',
+    make(){ return {...dificil(7), pasos:['l1','l2','l3']}; }},              // sólo las cuentas
 
-  { id:5, color:'var(--red)', title:'Todo junto', modo:'todo',
-    make(){ return {...cruzada(8), pasos:['c1','l1','c2','l2','c3','l3']}; }},
+  { id:5, color:'var(--red)', title:'Todo junto',
+    make(){ return {...dificil(8), pasos:['c1','l1','c2','l2','c3','l3']}; }},
 
-  { id:6, color:'#00897b', title:'Vos solo', modo:'todo',
-    make(){ return {...cruzada(9), pasos:['c1','l1','c2','l2','c3','l3'], solo:true}; }}
+  { id:6, color:'#00897b', title:'Vos solo',
+    make(){ return {...dificil(9), pasos:['c1','l1','c2','l2','c3','l3'], solo:true}; }}
 ];
 
 const NODOS = [{x:52,y:50},{x:20,y:160},{x:74,y:264},{x:26,y:374},{x:76,y:480},{x:44,y:588}];
@@ -360,8 +359,9 @@ function startLevel(L){ cur = {level:L, round:0, earned:0}; nextTask(); show('ga
 function nextTask(){
   const t = cur.level.make();
   cur.task = t;
-  cur.p = t.cruza ? pedazos(t) : [];
-  cur.r = t.cruza ? [t.m - cur.p[0], t.m - cur.p[0] - cur.p[1], t.m - t.s] : [t.m - t.s];
+  cur.p = t.p;
+  cur.r = []; let x = t.m;
+  for(const pe of cur.p){ x -= pe; cur.r.push(x); }
   cur.paso = 0;
   cur.fallos = 0;
   cur.listo = false;
@@ -380,29 +380,31 @@ function pintarHoja(){
   const idxL = i => t.pasos.indexOf('l' + (i+1));
   const corteListo = i => idxC(i) === -1 ? true : idxC(i) < hechos;   // -1 = ya venía marcado
 
-  if(t.cruza){
-    $('cortes').innerHTML = [0,1,2].map(i => {
+  const N = t.p.length;
+  const flechas = N === 2 ? ['↖','↗'] : ['↖','↑','↗'];
+  const idx = [...Array(N).keys()];
+  {
+    $('cortes').innerHTML = idx.map(i => {
       const ya = corteListo(i), turno = t.pasos[hechos] === 'c' + (i+1);
       return `<div class="col">
                 <div class="corte${ya?' puesto':''}${turno?' turno':''}">${ya ? cur.p[i] : '?'}</div>
                 <div class="plata${ya?'':' off'}">${(ya || !t.solo) ? plata(cur.p[i]) : ''}</div>
               </div>`;
     }).join('');
-    $('flechas').innerHTML = [0,1,2].map(i =>
-      `<span class="${corteListo(i)?'on':''}">${['↖','↑','↗'][i]}</span>`).join('');
-  }else{
-    $('cortes').innerHTML = ''; $('flechas').innerHTML = '';
+    $('flechas').innerHTML = idx.map(i =>
+      `<span class="${corteListo(i)?'on':''}">${flechas[i]}</span>`).join('');
   }
 
-  const arriba = t.cruza ? `${tens(t.m)/10 ? String(t.m).slice(0,-1) : ''}<span class="uni">${units(t.m)}</span>` : t.m;
-  const der = cur.listo ? ` <span class="res">${t.m - t.s}</span>`
-            : (t.cruza ? '' : ` <span class="hueco">${cur.buf || '?'}</span>`);
-  $('principal').innerHTML = `${arriba} − ${t.s} =${der}`;
+  /* de dónde sale el pedacito clave: con tres, las unidades de arriba; con dos, las de abajo */
+  const arriba = N === 3 ? `${String(t.m).slice(0,-1)}<span class="uni">${units(t.m)}</span>` : `${t.m}`;
+  const abajo  = N === 2 ? `${String(t.s).slice(0,-1)}<span class="uni">${units(t.s)}</span>` : `${t.s}`;
+  const der = cur.listo ? ` <span class="res">${t.m - t.s}</span>` : '';   // el resultado sale de la última línea
+  $('principal').innerHTML = `${arriba} − ${abajo} =${der}`;
 
   const L = [];
-  if(t.cruza){
-    const pares = [[t.m, cur.p[0], cur.r[0]], [cur.r[0], cur.p[1], cur.r[1]], [cur.r[1], cur.p[2], cur.r[2]]];
-    for(let i = 0; i < 3; i++){
+  {
+    const pares = t.p.map((pe,i) => [i === 0 ? t.m : cur.r[i-1], pe, cur.r[i]]);
+    for(let i = 0; i < t.p.length; i++){
       let escrita, activa = false;
       if(idxL(i) !== -1){ escrita = idxL(i) < hechos; activa = t.pasos[hechos] === 'l' + (i+1); }
       else { escrita = corteListo(i) && idxC(i) !== -1; }        // sin línea propia: sale sola con el corte
@@ -428,13 +430,11 @@ function pedir(){
   cur.buf = '';
   $('pide').className = 'pide';
 
-  if(paso === 'res'){
-    texto('✏️', '¿Cuánto da?');
-    teclado(true);
-  }
-  else if(paso[0] === 'c'){
-    const i = +paso[1] - 1;
-    texto('✏️', ['Primero las decenas', 'Bajá al redondo', 'Lo que sobra'][i]);
+  if(paso[0] === 'c'){
+    const i = +paso[1] - 1, N = t.p.length;
+    const qs = N === 2 ? ['Primero las decenas', 'Ahora las unidades']
+                       : ['Primero las decenas', 'Bajá al redondo', 'Lo que sobra'];
+    texto('✏️', qs[i]);
     teclado(false);
     opciones(cur.p[i], i);
   }
@@ -480,7 +480,7 @@ function elegir(v, boton, correcta){
 function pistaCorte(){
   const paso = cur.task.pasos[cur.paso], i = +paso[1] - 1, t = cur.task;
   if(i === 0) return `Las decenas del ${t.s}`;
-  if(i === 1) return `Mirá el final del ${t.m}`;
+  if(i === 1) return t.p.length === 2 ? `El final del ${t.s}` : `El final del ${t.m}`;
   return `Del ${t.s} ya sacaste ${cur.p[0] + cur.p[1]}`;
 }
 
@@ -494,7 +494,7 @@ function tecla(k){
 function revisar(){
   if(cur.buf === '') return;
   const paso = cur.task.pasos[cur.paso];
-  const esperado = paso === 'res' ? cur.task.m - cur.task.s : cur.r[+paso[1] - 1];
+  const esperado = cur.r[+paso[1] - 1];
   if(+cur.buf !== esperado){
     cur.fallos++; sNo();
     texto('🙈', cur.fallos >= 2 ? pistaLinea() : 'Casi…', 'mal');
@@ -508,11 +508,10 @@ function revisar(){
   pintarHoja();
 }
 function pistaLinea(){
-  const paso = cur.task.pasos[cur.paso], t = cur.task;
-  if(paso === 'res') return t.cruza ? `Sacá primero ${tens(t.s)}` : `Decenas con decenas`;
-  const i = +paso[1] - 1;
+  const i = +cur.task.pasos[cur.paso][1] - 1, N = cur.task.p.length;
   if(i === 0) return `Las unidades no se tocan`;
-  if(i === 1) return `Tenés que caer en ${cur.r[1]}`;
+  if(i === 1 && N === 3) return `Tenés que caer en ${cur.r[1]}`;
+  if(i === 1) return `Contá para atrás`;
   return `Desde un redondo es fácil`;
 }
 
