@@ -40,6 +40,8 @@ En la última parada esa ayuda no está.
 el `30` son tres billetes verdes, el `2` son dos monedas. Los que todavía no eligió aparecen en gris,
 así puede contarlos antes de decidir. Y **las unidades del número de arriba van resaltadas en amarillo**
 (el `2` de `72`), que es de donde sale el pedacito del medio — el que lo deja parado en un redondo.
+**El casillero del medio está pintado del mismo amarillo**, con su flecha, para que se lea que son la
+misma cosa; y mientras toca elegirlo, el dígito late.
 En la última parada la ayuda gris desaparece.
 
 Casi sin texto: las únicas consignas son **“Primero las decenas”**, **“Bajá al redondo”**,

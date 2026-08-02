@@ -88,6 +88,9 @@
   .plata.off .mo{background:#eae6da;border-color:#d2ccbc}
   .corte.puesto{border-style:solid;border-color:var(--green);background:#eefaf2;animation:caer .35s}
   .corte.turno{border-color:var(--orange);animation:latir 1.2s infinite}
+  /* el pedacito que sale del dígito resaltado: mismo amarillo, para que se lean juntos */
+  .corte.clave{border-color:#e6a417;background:#fff8e6;box-shadow:inset 0 -7px 0 #f5c344}
+  .flechas span.clave{color:#e6a417}
   @keyframes caer{from{transform:translateY(-26px) scale(.5);opacity:0}to{transform:none;opacity:1}}
   @keyframes latir{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
   .flechas{display:flex;justify-content:center;gap:10px;color:#9fb0c9;font-size:1.5rem;line-height:.9;margin-bottom:2px}
@@ -98,6 +101,7 @@
   .principal .res{color:var(--green-d)}
   /* las unidades del número de arriba: de ahí sale el pedacito del medio */
   .principal .uni{border-radius:8px;padding:0 5px;background:#fff2cf;box-shadow:inset 0 -6px 0 #f5c344}
+  .principal .uni.busca{animation:latir 1.1s infinite}
 
   .plataLinea{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin:2px 0 6px}
   .plataLinea .bi,.plataLinea .mo{position:relative}
@@ -399,13 +403,14 @@ function pintarHoja(){
   {
     $('cortes').innerHTML = idx.map(i => {
       const ya = corteListo(i), turno = t.pasos[hechos] === 'c' + (i+1);
+      const clave = i === 1 ? ' clave' : '';        // el que sale del dígito resaltado
       return `<div class="col">
-                <div class="corte${ya?' puesto':''}${turno?' turno':''}">${ya ? cur.p[i] : '?'}</div>
+                <div class="corte${ya?' puesto':''}${turno?' turno':''}${clave}">${ya ? cur.p[i] : '?'}</div>
                 <div class="plata${ya?'':' off'}">${(ya || !t.solo) ? plata(cur.p[i]) : ''}</div>
               </div>`;
     }).join('');
     $('flechas').innerHTML = idx.map(i =>
-      `<span class="${corteListo(i)?'on':''}">${flechas[i]}</span>`).join('');
+      `<span class="${corteListo(i)?'on':''}${i === 1 ? ' clave' : ''}">${flechas[i]}</span>`).join('');
   }
 
   /* el objetivo, a la vista: los pedacitos tienen que sumar el número que se resta */
@@ -415,8 +420,9 @@ function pintarHoja(){
                            .join(' + ') + ` = ${t.s}`;
 
   /* de dónde sale el pedacito clave: con tres, las unidades de arriba; con dos, las de abajo */
-  const arriba = N === 3 ? `${String(t.m).slice(0,-1)}<span class="uni">${units(t.m)}</span>` : `${t.m}`;
-  const abajo  = N === 2 ? `${String(t.s).slice(0,-1)}<span class="uni">${units(t.s)}</span>` : `${t.s}`;
+  const mirar = t.pasos[hechos] === 'c2' ? ' busca' : '';   // late justo cuando hay que elegirlo
+  const arriba = N === 3 ? `${String(t.m).slice(0,-1)}<span class="uni${mirar}">${units(t.m)}</span>` : `${t.m}`;
+  const abajo  = N === 2 ? `${String(t.s).slice(0,-1)}<span class="uni${mirar}">${units(t.s)}</span>` : `${t.s}`;
   const der = cur.listo ? ` <span class="res">${t.m - t.s}</span>` : '';   // el resultado sale de la última línea
   $('principal').innerHTML = `${arriba} − ${abajo} =${der}`;
 
