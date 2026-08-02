@@ -215,33 +215,28 @@ python3 -m http.server 8080
 
 O directamente: abrir `index.html` con doble clic (no necesita servidor).
 
-## Desplegar en DigitalOcean App Platform
+## Desplegado
 
-App Platform necesita un repo git como origen. Una sola vez:
+**https://mates-juan-bautista-h9tgg.ondigitalocean.app**
 
-```bash
-# 1. subir a GitHub (repo nuevo, vacío, sin README)
-git init && git add -A && git commit -m "El Kiosco"
-git branch -M main
-git remote add origin git@github.com:TU-USUARIO/el-kiosco.git
-git push -u origin main
+App Platform, sitio estático, plan gratuito. App ID `d01fc886-4bb9-4ce3-a3e0-2bfa18772d2b`
+(cuenta DO `nico@coolway.com`).
 
-# 2. poner tu usuario/repo en .do/app.yaml (línea `repo:`)
+Hay dos specs, según cómo esté vinculado GitHub con la cuenta de DigitalOcean:
 
-# 3. crear la app
-doctl apps create --spec .do/app.yaml
-```
+- **`.do/app-git.yaml`** — el que está en uso. Clona el repo público directo, **no necesita
+  vincular GitHub**, pero tampoco hay autodeploy: después de cada push hay que correr
+  `doctl apps create-deployment d01fc886-4bb9-4ce3-a3e0-2bfa18772d2b`.
+- **`.do/app.yaml`** — origen GitHub, con `deploy_on_push: true`. Requiere autorizar el repo desde
+  la consola de DigitalOcean (Apps → Create → GitHub → Manage Access). Es el que conviene si algún
+  día se pasa a una cuenta con GitHub vinculado.
 
-A partir de ahí, cada `git push` a `main` redespliega solo (`deploy_on_push: true`).
-
-Para ver la URL: `doctl apps list`. Sitio estático → **plan Starter, gratis** (3 sitios estáticos
-sin costo por cuenta).
-
-Si preferís la consola web: **Create → Apps → GitHub → este repo → Resource Type: Static Site**,
-output directory `/`. No hace falta comando de build.
-
-### Actualizar después de un cambio
+### Publicar un cambio
 
 ```bash
 git add -A && git commit -m "ajustes" && git push
+doctl apps create-deployment d01fc886-4bb9-4ce3-a3e0-2bfa18772d2b
 ```
+
+Tarda menos de un minuto. Para ver el estado:
+`doctl apps get d01fc886-4bb9-4ce3-a3e0-2bfa18772d2b`

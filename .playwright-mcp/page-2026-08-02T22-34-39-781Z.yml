@@ -1,0 +1,34 @@
+- generic [ref=f69e2]:
+  - generic [ref=f69e3]:
+    - generic [ref=f69e4]: 🎒
+    - heading "¡Hola, Juan Bautista!" [level=1] [ref=f69e5]
+    - paragraph [ref=f69e6]: ¿Con cuál jugás hoy?
+    - generic [ref=f69e7]: ⭐ 0 estrellas
+  - generic [ref=f69e8]:
+    - link "empezá acá ✏️ Como en clase Restar con las flechitas, igual que en el cuaderno. 43 − 28 → 20 · 3 · 5 sin jugar todavía" [ref=f69e9] [cursor=pointer]:
+      - /url: hoja.html
+      - generic [ref=f69e10]: empezá acá
+      - generic [ref=f69e11]: ✏️
+      - generic [ref=f69e12]:
+        - generic [ref=f69e13]: Como en clase
+        - generic [ref=f69e14]: Restar con las flechitas, igual que en el cuaderno.
+        - generic [ref=f69e15]: 43 − 28 → 20 · 3 · 5
+        - generic [ref=f69e16]: sin jugar todavía
+    - link "💵 El Kiosco Comprar pagando con billetes y monedas. 🍫 $18 · rompé un billete sin jugar todavía" [ref=f69e17] [cursor=pointer]:
+      - /url: kiosco.html
+      - generic [ref=f69e18]: 💵
+      - generic [ref=f69e19]:
+        - generic [ref=f69e20]: El Kiosco
+        - generic [ref=f69e21]: Comprar pagando con billetes y monedas.
+        - generic [ref=f69e22]: 🍫 $18 · rompé un billete
+        - generic [ref=f69e23]: sin jugar todavía
+    - link "🏦 El Banquito Armar y partir números con plata. 47 = 40 + 7 = 30 + 17 sin jugar todavía" [ref=f69e24] [cursor=pointer]:
+      - /url: numeros.html
+      - generic [ref=f69e25]: 🏦
+      - generic [ref=f69e26]:
+        - generic [ref=f69e27]: El Banquito
+        - generic [ref=f69e28]: Armar y partir números con plata.
+        - generic [ref=f69e29]: 47 = 40 + 7 = 30 + 17
+        - generic [ref=f69e30]: sin jugar todavía
+  - group [ref=f69e31]:
+    - generic "👩‍🏫 Para el adulto — por dónde empezar" [ref=f69e32] [cursor=pointer]

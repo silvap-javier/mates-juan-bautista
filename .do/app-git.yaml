@@ -1,0 +1,17 @@
+# Variante sin vincular GitHub con DigitalOcean: clona el repo público directo.
+# No hay autodeploy: después de cada push hay que correr
+#   doctl apps create-deployment <APP_ID>
+name: mates-juan-bautista
+region: nyc
+features:
+  - buildpack-stack=ubuntu-22
+
+static_sites:
+  - name: web
+    git:
+      repo_clone_url: https://github.com/silvap-javier/mates-juan-bautista.git
+      branch: main
+    source_dir: /
+    output_dir: /
+    index_document: index.html
+    catchall_document: index.html
