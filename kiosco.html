@@ -122,6 +122,8 @@
            color:var(--muted);display:flex;align-items:center;gap:6px}
   .zone h3 .amt{margin-left:auto;font-size:1.15rem;letter-spacing:0;color:var(--ink)}
   .money{display:flex;flex-wrap:wrap;gap:7px;min-height:50px;align-content:flex-start}
+  .counter .money{min-height:0}
+  .counter .money:empty{display:none}
   .money.coins{margin-top:8px}
   .empty{color:#b9ae9d;font-weight:800;font-size:.92rem;align-self:center}
 
@@ -135,6 +137,12 @@
   .bill:active,.coin:active{transform:translateY(3px);box-shadow:none}
   .counter .bill,.counter .coin{cursor:default;opacity:.9}
   @keyframes pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+  .coin.nuevo{animation:brotar .55s}
+  @keyframes brotar{
+    0%{transform:scale(.2) translateY(-26px);opacity:0}
+    60%{transform:scale(1.25) translateY(0);opacity:1;box-shadow:0 0 0 8px rgba(245,195,68,.45)}
+    100%{transform:scale(1);box-shadow:0 3px 0 var(--coin-d)}
+  }
   .shake{animation:shake .35s}
   @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
 
@@ -145,6 +153,10 @@
   .act{width:100%;font:inherit;font-weight:900;font-size:1.1rem;padding:14px 10px;cursor:pointer;
        border-radius:16px;margin-bottom:10px;
        background:var(--orange);border:2px solid #c9741f;color:#fff;box-shadow:0 4px 0 #c9741f}
+  .act{display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap}
+  .act b{font-size:1.5rem;margin:0 6px}
+  .bmini{width:44px;height:28px;border-radius:5px;background:var(--bill);border:3px solid #fff;flex:none}
+  .cmini{width:20px;height:20px;border-radius:50%;background:var(--coin);border:3px solid #fff;flex:none}
   .act:active{transform:translateY(3px);box-shadow:0 1px 0 #c9741f}
   .act:disabled{opacity:.4;box-shadow:none;cursor:not-allowed}
   .act.change{background:var(--green);border-color:var(--green-d);box-shadow:0 4px 0 var(--green-d)}
@@ -243,13 +255,13 @@
     <div id="playArea">
       <!-- lo que hace falta para poder restar -->
       <div class="descomp" id="descomp">
-        <h3>🔎</h3>
+        <h3>🔎 para pagar</h3>
         <div class="drow head"><div></div><div>💵 billetes<br>de 10</div><div>🪙 monedas<br>de 1</div></div>
         <div class="drow"><div class="dlab" id="dLabA"></div>
           <div class="dcell bills" id="dAb"></div><div class="dcell coins" id="dAc"></div></div>
         <div class="drow"><div class="dlab" id="dLabB"></div>
           <div class="dcell bills" id="dBb"></div><div class="dcell coins" id="dBc"></div></div>
-        <div class="drow res"><div class="dlab">te quedan</div>
+        <div class="drow res"><div class="dlab" id="dLabC">te queda</div>
           <div class="dcell" id="dCb"></div><div class="dcell" id="dCc"></div></div>
         <div class="dnota" id="dNota"></div>
       </div>
@@ -260,7 +272,9 @@
         <div class="money coins" id="wCoins"></div>
       </div>
 
-      <button class="act" id="breakBtn">🔨 Romper un billete → 10 monedas</button>
+      <button class="act" id="breakBtn">
+        <span class="bmini"></span><b>🔨</b><span class="cmini"></span><span class="cmini"></span><span class="cmini"></span><span class="cmini"></span><span class="cmini"></span><span class="cmini"></span><span class="cmini"></span><span class="cmini"></span><span class="cmini"></span><span class="cmini"></span>
+      </button>
       <button class="act change hidden" id="changeBtn"></button>
 
       <div class="zone counter">
@@ -271,7 +285,7 @@
 
       <!-- la cuenta que se va escribiendo sola -->
       <div class="ops">
-        <h3>📝</h3>
+        <h3>📝 la cuenta</h3>
         <div id="opsList"></div>
       </div>
     </div>
@@ -595,10 +609,10 @@ function render(){
   $('pAmt').textContent = pVal() + ' $';
 
   fill($('wBills'), cur.w.b, 'bill', '10', payBill, 'No te quedan billetes');
-  fill($('wCoins'), cur.w.c, 'coin', '1',  payCoin, 'No te quedan monedas sueltas');
+  fill($('wCoins'), cur.w.c, 'coin', '1',  payCoin, 'No te quedan monedas sueltas', cur.brillo || 0);
   fill($('pBills'), cur.p.b, 'bill', '10', null, '');
   fill($('pCoins'), cur.p.c, 'coin', '1',  null, '');
-  if(!cur.p.b && !cur.p.c) $('pBills').innerHTML = '<span class="empty">todavía no diste nada</span>';
+  if(!cur.p.b && !cur.p.c) $('pBills').innerHTML = '<span class="empty">—</span>';
 
   renderDescomp();
   $('breakBtn').disabled = cur.w.b === 0 || f <= 0;
@@ -630,10 +644,12 @@ function renderDescomp(){
   $('dBb').textContent = B.b;
   $('dBc').textContent = B.c;
 
-  $('dCb').innerHTML = listo ? cur.w.b : '<span class="humo">?</span>';
-  $('dCc').innerHTML = listo ? cur.w.c : '<span class="humo">?</span>';
-  $('dCb').className = 'dcell' + (listo ? ' listo' : '');
-  $('dCc').className = 'dcell' + (listo ? ' listo' : '');
+  /* siempre a la vista: es lo que hay ahora en la billetera */
+  $('dLabC').innerHTML = listo ? `te quedó <b>${wVal()}</b>` : `te queda <b>${wVal()}</b>`;
+  $('dCb').textContent = cur.w.b;
+  $('dCc').textContent = cur.w.c;
+  $('dCb').className = 'dcell bills' + (listo ? ' listo' : '');
+  $('dCc').className = 'dcell coins' + (listo ? ' listo' : '');
 
   const nota = $('dNota');
   if(listo){
@@ -654,12 +670,13 @@ function renderDescomp(){
   }
 }
 
-function fill(box, n, cls, txt, fn, vacio){
+function fill(box, n, cls, txt, fn, vacio, brillan = 0){
   box.innerHTML = '';
   if(n === 0){ if(vacio) box.innerHTML = `<span class="empty">${vacio}</span>`; return; }
   for(let i = 0; i < n; i++){
     const b = document.createElement('button');
-    b.className = cls; b.textContent = txt;
+    b.className = cls + (i >= n - brillan ? ' nuevo' : '');   // las que acaban de salir del billete
+    b.textContent = txt;
     if(fn) b.onclick = fn; else b.disabled = true;
     box.appendChild(b);
   }
@@ -719,7 +736,8 @@ function payCoin(){
 function breakBill(){
   if(cur.w.b === 0) return nope('No te quedan billetes para romper.');
   const sueltas = cur.w.c;
-  cur.acts.push('r'); replay(); sBreak(); render();
+  cur.acts.push('r'); replay(); sBreak();
+  cur.brillo = 10; render(); cur.brillo = 0;
   if(sueltas > 0)
     say('😅', `Tenías <b>${sueltas}</b> 🪙 👉 dalas primero`, 'no');
   else

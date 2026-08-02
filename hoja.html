@@ -99,6 +99,13 @@
   /* las unidades del número de arriba: de ahí sale el pedacito del medio */
   .principal .uni{border-radius:8px;padding:0 5px;background:#fff2cf;box-shadow:inset 0 -6px 0 #f5c344}
 
+  .plataLinea{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin:2px 0 6px}
+  .plataLinea .bi,.plataLinea .mo{position:relative}
+  .bi.fuera,.mo.fuera{background:#efece3;border-color:#cfc9ba}
+  .bi.fuera::after,.mo.fuera::after{
+    content:"";position:absolute;left:-3px;right:-3px;top:50%;
+    border-top:3px solid var(--red);transform:rotate(-24deg);border-radius:2px;
+  }
   .lineas{margin-top:10px;display:grid;gap:2px}
   .linea{font-size:1.55rem;font-weight:900;text-align:center;animation:escribir .4s}
   .linea .hueco{display:inline-grid;place-items:center;min-width:62px;height:40px;
@@ -424,9 +431,23 @@ function pintarHoja(){
       const [a, b, c] = pares[i];
       L.push(`<div class="linea${escrita?' ok':''}">${a} − ${b} = ` +
              (escrita ? c : `<span class="hueco">${cur.buf || '?'}</span>`) + `</div>`);
+      if(activa && !t.solo) L.push(plataResta(a, b));      // la cuenta, en plata
     }
   }
   $('lineas').innerHTML = L.join('');
+}
+
+/* la línea que se está haciendo, en plata: se tacha lo que hay que sacar.
+   Si no alcanzan las monedas sueltas, el número ya viene con un billete roto. */
+function plataResta(a, b){
+  let bi = Math.floor(a/10), mo = a % 10;
+  if(b % 10 !== 0 && mo < b){ bi--; mo += 10; }
+  const fueraBi = b % 10 === 0 ? b/10 : 0;
+  const fueraMo = b % 10 === 0 ? 0 : b;
+  let h = '';
+  for(let i = 0; i < bi; i++) h += `<span class="bi${i < fueraBi ? ' fuera' : ''}"></span>`;
+  for(let i = 0; i < mo; i++) h += `<span class="mo${i < fueraMo ? ' fuera' : ''}"></span>`;
+  return `<div class="plataLinea">${h}</div>`;
 }
 
 /* un pedacito dibujado en plata: los de 10 son billetes, los sueltos monedas */

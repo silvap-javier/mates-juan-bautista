@@ -30,6 +30,12 @@ Todas las cuentas son **menores a 50** y el número que se resta tiene **2 o 3 d
 cuaderno. En las paradas de tres pedacitos, arriba se ve el objetivo armándose solo:
 `? + ? + ? = 26` → `20 + 4 + 2 = 26`, así queda claro que los pedazos tienen que sumar el número.
 
+**Cada línea se resuelve mirando plata.** Debajo de la cuenta activa aparece el número en billetes
+y monedas, con **tachado en rojo lo que hay que sacar**: para `44 − 30` se ven 4 billetes y 4 monedas
+con 3 billetes tachados, y sólo hay que contar lo que queda. Cuando toca restar de un redondo
+(`30 − 4`), el número aparece ya con **un billete roto en 10 monedas** — el mismo canje del kiosco.
+En la última parada esa ayuda no está.
+
 **La descomposición se ve, no se lee.** Debajo de cada flechita está el pedacito dibujado en plata:
 el `30` son tres billetes verdes, el `2` son dos monedas. Los que todavía no eligió aparecen en gris,
 así puede contarlos antes de decidir. Y **las unidades del número de arriba van resaltadas en amarillo**
